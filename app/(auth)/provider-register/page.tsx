@@ -12,7 +12,7 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import { TIPOS_SERVICO_LIST, TIPOS_SERVICO_LABELS, ESTADOS_BR, TipoServico } from '@/types'
-import { CheckCircle, Wrench } from 'lucide-react'
+import { CheckCircle, Wrench, Camera, X, Upload } from 'lucide-react'
 
 const schema = z.object({
   email: z.string().email('E-mail inválido'),
@@ -53,6 +53,8 @@ export default function ProviderRegisterPage() {
   const [erro, setErro] = useState('')
   const [sucesso, setSucesso] = useState(false)
   const [etapa, setEtapa] = useState(1)
+  const [fotos, setFotos] = useState<File[]>([])
+  const [fotosPreviews, setFotosPreviews] = useState<string[]>([])
 
   const {
     register,
@@ -74,6 +76,19 @@ export default function ProviderRegisterPage() {
   })
 
   const tipoPrestador = watch('tipo_prestador')
+
+  function handleFotos(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files || [])
+    const novas = [...fotos, ...files].slice(0, 3)
+    setFotos(novas)
+    setFotosPreviews(novas.map(f => URL.createObjectURL(f)))
+  }
+
+  function removerFoto(i: number) {
+    const novas = fotos.filter((_, idx) => idx !== i)
+    setFotos(novas)
+    setFotosPreviews(novas.map(f => URL.createObjectURL(f)))
+  }
 
   async function onSubmit(data: FormData) {
     setErro('')
@@ -111,6 +126,21 @@ export default function ProviderRegisterPage() {
     // Geocodificar cidade para exibir no mapa
     const coords = await geocodeCity(data.cidade, data.estado)
 
+    // Upload das fotos
+    let fotoUrl: string | null = null
+    if (fotos.length > 0) {
+      const foto = fotos[0]
+      const ext = foto.name.split('.').pop()
+      const path = `${userId}/trabalho.${ext}`
+      const { error: uploadError } = await supabase.storage
+        .from('provider-photos')
+        .upload(path, foto, { upsert: true })
+      if (!uploadError) {
+        const { data: urlData } = supabase.storage.from('provider-photos').getPublicUrl(path)
+        fotoUrl = urlData.publicUrl
+      }
+    }
+
     // 2. Criar registro de prestador
     const { error: providerError } = await supabase.from('providers').insert({
       profile_id: userId,
@@ -137,6 +167,7 @@ export default function ProviderRegisterPage() {
       raio_km: parseInt(data.raio_km) || 20,
       descricao: data.descricao || null,
       pix: data.pix || null,
+      foto_url: fotoUrl,
       status_aprovacao: 'pendente',
       latitude: coords?.lat ?? null,
       longitude: coords?.lng ?? null,
@@ -367,6 +398,38 @@ export default function ProviderRegisterPage() {
               />
             </div>
             <Input label="Chave Pix" type="text" placeholder="CPF, e-mail, telefone ou chave aleatória" error={errors.pix?.message} {...register('pix')} />
+          </fieldset>
+
+          {/* SEÇÃO: Fotos */}
+          <hr className="border-gray-100" />
+          <fieldset className="space-y-4">
+            <legend className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+              Fotos das ferramentas ou local de trabalho
+            </legend>
+            <p className="text-xs text-gray-400">Até 3 fotos. Ajuda a transmitir mais confiança para os clientes.</p>
+
+            <div className="flex flex-wrap gap-3">
+              {fotosPreviews.map((src, i) => (
+                <div key={i} className="relative w-24 h-24 rounded-xl overflow-hidden border border-gray-200">
+                  <img src={src} alt="" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => removerFoto(i)}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+
+              {fotos.length < 3 && (
+                <label className="w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-orange-400 hover:bg-orange-50 transition-colors">
+                  <Camera className="w-5 h-5 text-gray-400" />
+                  <span className="text-xs text-gray-400">Adicionar</span>
+                  <input type="file" accept="image/*" multiple className="hidden" onChange={handleFotos} />
+                </label>
+              )}
+            </div>
           </fieldset>
 
           {erro && (
