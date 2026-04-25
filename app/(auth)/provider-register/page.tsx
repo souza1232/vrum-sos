@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/client'
 import { geocodeCity } from '@/lib/geocoding'
+import { useEmail } from '@/hooks/useEmail'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
@@ -50,6 +51,7 @@ type FormData = z.infer<typeof schema>
 export default function ProviderRegisterPage() {
   const router = useRouter()
   const supabase = createClient()
+  const { sendProviderStatusEmail } = useEmail()
   const [erro, setErro] = useState('')
   const [sucesso, setSucesso] = useState(false)
   const [etapa, setEtapa] = useState(1)
@@ -178,6 +180,18 @@ export default function ProviderRegisterPage() {
       return
     }
 
+    // Enviar email de cadastro pendente (não bloqueia se falhar)
+    try {
+      await sendProviderStatusEmail(
+        data.email,
+        data.nome,
+        'pending',
+        data.nome_empresa || undefined
+      )
+    } catch (emailError) {
+      console.warn('Erro ao enviar email de confirmação:', emailError)
+    }
+
     setSucesso(true)
     setTimeout(() => {
       router.push('/painel')
@@ -203,7 +217,7 @@ export default function ProviderRegisterPage() {
 
   return (
     <div className="w-full max-w-2xl">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 sm:p-8">
         {/* Header */}
         <div className="mb-8">
           <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
@@ -329,7 +343,7 @@ export default function ProviderRegisterPage() {
                 <Input label="CNPJ" type="text" placeholder="00.000.000/0000-00" error={errors.cnpj?.message} {...register('cnpj')} />
                 <Input label="Qtd. de veículos/equipe" type="number" min="1" error={errors.quantidade_equipe?.message} {...register('quantidade_equipe')} />
                 <div className="flex items-center gap-3 pt-5">
-                  <input type="checkbox" id="multiplos" className="accent-orange-500 w-4 h-4" {...register('atende_multiplos_chamados')} />
+                  <input type="checkbox" id="multiplos" className="accent-orange-500 w-5 h-5" {...register('atende_multiplos_chamados')} />
                   <label htmlFor="multiplos" className="text-sm font-medium text-gray-700">Atende múltiplos chamados?</label>
                 </div>
               </div>
@@ -339,7 +353,7 @@ export default function ProviderRegisterPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-xl">
                 <Input label="CPF (opcional)" type="text" placeholder="000.000.000-00" error={errors.cpf?.message} {...register('cpf')} />
                 <div className="flex items-center gap-3 pt-5">
-                  <input type="checkbox" id="sozinho" className="accent-orange-500 w-4 h-4" defaultChecked {...register('trabalha_sozinho')} />
+                  <input type="checkbox" id="sozinho" className="accent-orange-500 w-5 h-5" defaultChecked {...register('trabalha_sozinho')} />
                   <label htmlFor="sozinho" className="text-sm font-medium text-gray-700">Trabalha sozinho?</label>
                 </div>
               </div>
@@ -353,7 +367,7 @@ export default function ProviderRegisterPage() {
             <legend className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
               Disponibilidade
             </legend>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[
                 { id: 'atende_24h', label: '24 horas' },
                 { id: 'atende_finais_semana', label: 'Fins de semana' },

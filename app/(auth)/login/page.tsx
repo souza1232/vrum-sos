@@ -65,7 +65,7 @@ export default function LoginPage() {
 
   return (
     <div className="w-full max-w-md">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 sm:p-8">
         <div className="mb-8">
           <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-4">
             <LogIn className="w-6 h-6 text-orange-600" />
@@ -104,6 +104,11 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-6 space-y-3 text-center">
+          <p className="text-sm text-gray-500">
+            <Link href="/forgot-password" className="text-gray-400 hover:text-orange-500">
+              Esqueceu sua senha?
+            </Link>
+          </p>
           <p className="text-sm text-gray-500">
             Não tem conta?{' '}
             <Link href="/register" className="text-orange-500 font-semibold hover:text-orange-600">

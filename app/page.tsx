@@ -114,23 +114,23 @@ export default function HomePage() {
                 perto de você, agora mesmo. Rápido, confiável e verificado.
               </p>
 
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-col sm:flex-row flex-wrap gap-3">
                 <Link
                   href="/register"
-                  className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-4 rounded-xl text-base transition-all hover:shadow-lg hover:shadow-orange-500/30 active:scale-95"
+                  className="inline-flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3.5 sm:px-8 sm:py-4 rounded-xl text-base transition-all hover:shadow-lg hover:shadow-orange-500/30 active:scale-95"
                 >
                   Começar agora
                   <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link
                   href="/login"
-                  className="inline-flex items-center gap-2 border-2 border-slate-600 hover:border-slate-400 text-gray-300 hover:text-white font-semibold px-8 py-4 rounded-xl text-base transition-colors"
+                  className="inline-flex items-center justify-center gap-2 border-2 border-slate-600 hover:border-slate-400 text-gray-300 hover:text-white font-semibold px-6 py-3.5 sm:px-8 sm:py-4 rounded-xl text-base transition-colors"
                 >
                   Já tenho conta
                 </Link>
                 <Link
                   href="/provider-register"
-                  className="inline-flex items-center gap-2 border-2 border-orange-500/40 hover:border-orange-500 text-orange-400 hover:text-orange-300 font-semibold px-8 py-4 rounded-xl text-base transition-colors"
+                  className="inline-flex items-center justify-center gap-2 border-2 border-orange-500/40 hover:border-orange-500 text-orange-400 hover:text-orange-300 font-semibold px-6 py-3.5 sm:px-8 sm:py-4 rounded-xl text-base transition-colors"
                 >
                   Quero ser prestador
                   <ChevronRight className="w-5 h-5" />
@@ -142,19 +142,6 @@ export default function HomePage() {
             <div className="hidden lg:flex items-center justify-center">
               <div className="w-full max-w-md">
                 <CarAnimation />
-                {/* Texto abaixo do carro */}
-                <div className="flex justify-center gap-6 mt-4">
-                  {[
-                    { label: '500+', desc: 'Prestadores' },
-                    { label: '24h', desc: 'Disponível' },
-                    { label: '4.9★', desc: 'Avaliação' },
-                  ].map(item => (
-                    <div key={item.label} className="text-center">
-                      <p className="text-orange-400 font-black text-lg">{item.label}</p>
-                      <p className="text-gray-500 text-xs">{item.desc}</p>
-                    </div>
-                  ))}
-                </div>
               </div>
             </div>
           </div>

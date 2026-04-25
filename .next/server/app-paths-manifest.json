@@ -1,6 +1,6 @@
 {
-  "/page": "app/page.js",
-  "/(admin)/admin/prestadores/page": "app/(admin)/admin/prestadores/page.js",
-  "/(admin)/admin/page": "app/(admin)/admin/page.js",
-  "/(admin)/admin/usuarios/page": "app/(admin)/admin/usuarios/page.js"
+  "/(auth)/login/page": "app/(auth)/login/page.js",
+  "/(user)/dashboard/page": "app/(user)/dashboard/page.js",
+  "/(user)/dashboard/solicitacoes/page": "app/(user)/dashboard/solicitacoes/page.js",
+  "/(user)/dashboard/perfil/page": "app/(user)/dashboard/perfil/page.js"
 }

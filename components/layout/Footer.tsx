@@ -32,8 +32,12 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-slate-800 mt-8 pt-6 text-center text-xs">
-          © {new Date().getFullYear()} Vrum SOS. Todos os direitos reservados.
+        <div className="border-t border-slate-800 mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <span>© {new Date().getFullYear()} Vrum SOS. Todos os direitos reservados.</span>
+          <div className="flex items-center gap-4">
+            <Link href="/termos" className="hover:text-white transition-colors">Termos de Uso</Link>
+            <Link href="/privacidade" className="hover:text-white transition-colors">Política de Privacidade</Link>
+          </div>
         </div>
       </div>
     </footer>

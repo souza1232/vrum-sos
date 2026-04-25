@@ -8,6 +8,7 @@ import { PageSpinner } from '@/components/ui/Spinner'
 import { StatusBadge } from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
+import { useEmail } from '@/hooks/useEmail'
 import { formatDate } from '@/lib/utils'
 import {
   Check, X, Trash2, Search, Filter, MapPin,
@@ -25,6 +26,7 @@ export default function AdminPrestadoresPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const { showToast, ToastComponent } = useToast()
+  const { sendProviderStatusEmail } = useEmail()
 
   useEffect(() => {
     async function init() {
@@ -60,7 +62,17 @@ export default function AdminPrestadoresPage() {
 
   async function updateStatus(id: string, status: StatusAprovacao) {
     setActionLoading(id)
+
+    // Buscar dados do prestador para o email
+    const provider = providers.find(p => p.id === id)
+    if (!provider) {
+      showToast('Prestador não encontrado.', 'error')
+      setActionLoading(null)
+      return
+    }
+
     try {
+      // Atualizar status no banco
       const { error } = await supabase
         .from('providers')
         .update({ status_aprovacao: status })
@@ -68,15 +80,32 @@ export default function AdminPrestadoresPage() {
 
       if (error) {
         showToast('Erro ao atualizar status.', 'error')
-      } else {
-        setProviders(prev =>
-          prev.map(p => p.id === id ? { ...p, status_aprovacao: status } : p)
-        )
-        showToast(
-          status === 'aprovado' ? 'Prestador aprovado!' : 'Prestador reprovado.',
-          status === 'aprovado' ? 'success' : 'error'
-        )
+        return
       }
+
+      // Atualizar estado local
+      setProviders(prev =>
+        prev.map(p => p.id === id ? { ...p, status_aprovacao: status } : p)
+      )
+
+      // Enviar email de notificação (não bloqueia se falhar)
+      if (status === 'aprovado') {
+        try {
+          await sendProviderStatusEmail(
+            provider.email,
+            provider.nome,
+            'approved',
+            provider.nome_empresa || undefined
+          )
+        } catch (emailError) {
+          console.warn('Erro ao enviar email de aprovação:', emailError)
+        }
+      }
+
+      showToast(
+        status === 'aprovado' ? 'Prestador aprovado! Email enviado.' : 'Prestador reprovado.',
+        status === 'aprovado' ? 'success' : 'error'
+      )
     } finally {
       setActionLoading(null)
     }

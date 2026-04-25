@@ -113,18 +113,18 @@ export default function UserSolicitacoesPage() {
 
         {/* Cards de resumo */}
         {!loading && requests.length > 0 && (
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
-              <p className="text-2xl font-black text-amber-700">{totais.pendente}</p>
-              <p className="text-xs text-amber-600 font-medium mt-0.5">Pendente{totais.pendente !== 1 ? 's' : ''}</p>
+          <div className="grid grid-cols-3 gap-2 sm:gap-4">
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 sm:p-4 text-center">
+              <p className="text-xl sm:text-2xl font-black text-amber-700">{totais.pendente}</p>
+              <p className="text-xs text-amber-600 font-medium mt-0.5 leading-tight">Pendente{totais.pendente !== 1 ? 's' : ''}</p>
             </div>
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
-              <p className="text-2xl font-black text-blue-700">{totais.em_andamento}</p>
-              <p className="text-xs text-blue-600 font-medium mt-0.5">Em andamento</p>
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 sm:p-4 text-center">
+              <p className="text-xl sm:text-2xl font-black text-blue-700">{totais.em_andamento}</p>
+              <p className="text-xs text-blue-600 font-medium mt-0.5 leading-tight">Em andamento</p>
             </div>
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
-              <p className="text-2xl font-black text-green-700">{totais.concluido}</p>
-              <p className="text-xs text-green-600 font-medium mt-0.5">Concluído{totais.concluido !== 1 ? 's' : ''}</p>
+            <div className="bg-green-50 border border-green-200 rounded-xl p-3 sm:p-4 text-center">
+              <p className="text-xl sm:text-2xl font-black text-green-700">{totais.concluido}</p>
+              <p className="text-xs text-green-600 font-medium mt-0.5 leading-tight">Concluído{totais.concluido !== 1 ? 's' : ''}</p>
             </div>
           </div>
         )}

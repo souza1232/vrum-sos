@@ -64,6 +64,38 @@ export default function ProviderSolicitacoesPage() {
         setProviderId(providerData.id)
         setIsApproved(providerData.status_aprovacao === 'aprovado')
         await fetchRequests(providerData.id)
+
+        // Realtime: escuta novas solicitações para este prestador
+        const channel = supabase
+          .channel(`solicitacoes_${providerData.id}`)
+          .on(
+            'postgres_changes',
+            {
+              event: 'INSERT',
+              schema: 'public',
+              table: 'service_requests',
+              filter: `provider_id=eq.${providerData.id}`,
+            },
+            async (payload) => {
+              // Busca o nome do usuário da nova solicitação
+              const { data: userData } = await supabase
+                .from('profiles')
+                .select('nome, email')
+                .eq('id', payload.new.user_id)
+                .single()
+
+              const nova: RequestWithUser = {
+                ...(payload.new as any),
+                user: userData ?? null,
+              }
+
+              setRequests(prev => [nova, ...prev])
+              showToast(`Nova solicitação de ${userData?.nome ?? 'usuário'}!`, 'success')
+            }
+          )
+          .subscribe()
+
+        return () => { supabase.removeChannel(channel) }
       } else {
         setLoading(false)
       }
@@ -165,18 +197,18 @@ export default function ProviderSolicitacoesPage() {
 
         {/* Resumo */}
         {!loading && requests.length > 0 && (
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
-              <p className="text-2xl font-black text-amber-700">{totais.pendente}</p>
-              <p className="text-xs text-amber-600 font-medium mt-0.5">Nova{totais.pendente !== 1 ? 's' : ''}</p>
+          <div className="grid grid-cols-3 gap-2 sm:gap-4">
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 sm:p-4 text-center">
+              <p className="text-xl sm:text-2xl font-black text-amber-700">{totais.pendente}</p>
+              <p className="text-xs text-amber-600 font-medium mt-0.5 leading-tight">Nova{totais.pendente !== 1 ? 's' : ''}</p>
             </div>
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
-              <p className="text-2xl font-black text-blue-700">{totais.em_andamento}</p>
-              <p className="text-xs text-blue-600 font-medium mt-0.5">Em andamento</p>
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 sm:p-4 text-center">
+              <p className="text-xl sm:text-2xl font-black text-blue-700">{totais.em_andamento}</p>
+              <p className="text-xs text-blue-600 font-medium mt-0.5 leading-tight">Andamento</p>
             </div>
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
-              <p className="text-2xl font-black text-green-700">{totais.concluido}</p>
-              <p className="text-xs text-green-600 font-medium mt-0.5">Concluído{totais.concluido !== 1 ? 's' : ''}</p>
+            <div className="bg-green-50 border border-green-200 rounded-xl p-3 sm:p-4 text-center">
+              <p className="text-xl sm:text-2xl font-black text-green-700">{totais.concluido}</p>
+              <p className="text-xs text-green-600 font-medium mt-0.5 leading-tight">Concluído{totais.concluido !== 1 ? 's' : ''}</p>
             </div>
           </div>
         )}

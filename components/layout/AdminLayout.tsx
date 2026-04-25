@@ -1,12 +1,12 @@
 import { ReactNode } from 'react'
 import Link from 'next/link'
 import Header from './Header'
-import { LayoutDashboard, Users, Wrench, FileText } from 'lucide-react'
+import { LayoutDashboard, Users, Wrench, FileText, Flag } from 'lucide-react'
 
 interface AdminLayoutProps {
   children: ReactNode
   nomeUsuario?: string
-  activeTab?: 'dashboard' | 'providers' | 'users' | 'requests'
+  activeTab?: 'dashboard' | 'providers' | 'users' | 'requests' | 'denuncias'
 }
 
 const navItems = [
@@ -14,6 +14,7 @@ const navItems = [
   { href: '/admin/prestadores', label: 'Prestadores', icon: Wrench, id: 'providers' },
   { href: '/admin/usuarios', label: 'Usuários', icon: Users, id: 'users' },
   { href: '/admin/solicitacoes', label: 'Solicitações', icon: FileText, id: 'requests' },
+  { href: '/admin/denuncias', label: 'Denúncias', icon: Flag, id: 'denuncias' },
 ]
 
 export default function AdminLayout({ children, nomeUsuario, activeTab }: AdminLayoutProps) {

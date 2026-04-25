@@ -102,6 +102,11 @@ export default function ProviderLoginPage() {
 
         <div className="mt-6 text-center space-y-2">
           <p className="text-sm text-gray-500">
+            <Link href="/forgot-password" className="text-gray-400 hover:text-orange-500">
+              Esqueceu sua senha?
+            </Link>
+          </p>
+          <p className="text-sm text-gray-500">
             Ainda não é prestador?{' '}
             <Link href="/provider-register" className="text-orange-500 font-semibold hover:text-orange-600">
               Cadastrar agora

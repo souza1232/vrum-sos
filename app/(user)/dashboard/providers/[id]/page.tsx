@@ -9,15 +9,17 @@ import { Provider, TIPOS_SERVICO_LABELS, TipoServico } from '@/types'
 import UserLayout from '@/components/layout/UserLayout'
 import { PageSpinner } from '@/components/ui/Spinner'
 import { useToast } from '@/components/ui/Toast'
+import { useEmail } from '@/hooks/useEmail'
 import ReviewList from '@/components/provider/ReviewList'
 import ProviderMapWrapper from '@/components/map/ProviderMapWrapper'
 import { whatsappLink, formatPhone } from '@/lib/utils'
 import { StarDisplay } from '@/components/ui/StarRating'
 import {
   MapPin, Phone, MessageCircle, Clock, Zap, Building2, User,
-  ChevronLeft, Check, Send, AlertTriangle, Map, Star
+  ChevronLeft, Check, Send, AlertTriangle, Map, Star, MessageSquare, Flag
 } from 'lucide-react'
 import Button from '@/components/ui/Button'
+import ReportModal from '@/components/ui/ReportModal'
 
 export default function ProviderDetailPage() {
   const params = useParams()
@@ -27,10 +29,14 @@ export default function ProviderDetailPage() {
   const [profile, setProfile] = useState<{ nome: string; tipo_usuario: 'user' | 'provider' | 'admin'; id: string } | null>(null)
   const [sending, setSending] = useState(false)
   const [observacao, setObservacao] = useState('')
+  const [tipoServico, setTipoServico] = useState('')
   const [avgRating, setAvgRating] = useState(0)
   const [totalReviews, setTotalReviews] = useState(0)
   const [activeTab, setActiveTab] = useState<'info' | 'reviews' | 'map'>('info')
+  const [showReport, setShowReport] = useState(false)
+  const [reportSent, setReportSent] = useState(false)
   const { showToast, ToastComponent } = useToast()
+  const { sendServiceRequestEmail } = useEmail()
 
   useEffect(() => {
     async function load() {
@@ -45,6 +51,7 @@ export default function ProviderDetailPage() {
       setProfile(profileData as any)
       if (providerData) {
         setProvider(providerData as Provider)
+        setTipoServico(providerData.tipos_servico[0] ?? '')
 
         // Buscar média de avaliações
         const { data: reviews } = await supabase
@@ -67,10 +74,11 @@ export default function ProviderDetailPage() {
     if (!profile || !provider) return
     setSending(true)
     try {
+      // Salvar solicitação no banco
       const { error } = await supabase.from('service_requests').insert({
         user_id: profile.id,
         provider_id: provider.id,
-        tipo_servico: provider.tipos_servico[0] ?? 'mecanico',
+        tipo_servico: tipoServico || provider.tipos_servico[0] ?? 'mecanico',
         cidade: provider.cidade,
         observacao: observacao || null,
         status: 'pendente',
@@ -78,10 +86,27 @@ export default function ProviderDetailPage() {
 
       if (error) {
         showToast('Erro ao enviar solicitação.', 'error')
-      } else {
-        showToast('Solicitação enviada com sucesso!', 'success')
-        setObservacao('')
+        return
       }
+
+      // Enviar email para o prestador (não bloqueia se falhar)
+      const tipoServicoLabel = TIPOS_SERVICO_LABELS[tipoServico as TipoServico] || tipoServico
+
+      try {
+        await sendServiceRequestEmail({
+          prestadorEmail: provider.email,
+          prestadorNome: provider.nome,
+          usuarioNome: profile.nome,
+          tipoServico: tipoServicoLabel,
+          cidade: provider.cidade,
+          observacao: observacao || undefined
+        })
+      } catch (emailError) {
+        console.warn('Erro ao enviar email de solicitação:', emailError)
+      }
+
+      showToast('Solicitação enviada! O prestador foi notificado por email.', 'success')
+      setObservacao('')
     } finally {
       setSending(false)
     }
@@ -112,6 +137,15 @@ export default function ProviderDetailPage() {
   return (
     <UserLayout tipoUsuario={profile?.tipo_usuario} nomeUsuario={profile?.nome}>
       {ToastComponent}
+      {showReport && profile && (
+        <ReportModal
+          providerId={provider.id}
+          providerNome={provider.nome}
+          userId={profile.id}
+          onClose={() => setShowReport(false)}
+          onSuccess={() => { setShowReport(false); setReportSent(true); showToast('Denúncia enviada. Obrigado pelo aviso!', 'success') }}
+        />
+      )}
 
       <div className="mb-6">
         <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-orange-500 transition-colors">
@@ -159,7 +193,7 @@ export default function ProviderDetailPage() {
             </div>
 
             {/* Abas */}
-            <div className="flex border-b border-gray-100">
+            <div className="flex border-b border-gray-100 overflow-x-auto">
               {[
                 { id: 'info', label: 'Informações' },
                 { id: 'reviews', label: `Avaliações${totalReviews > 0 ? ` (${totalReviews})` : ''}` },
@@ -288,11 +322,49 @@ export default function ProviderDetailPage() {
             )}
           </div>
 
+          {/* Denunciar */}
+          {!reportSent ? (
+            <button
+              onClick={() => setShowReport(true)}
+              className="flex items-center justify-center gap-2 w-full text-gray-400 hover:text-red-500 text-xs py-1 transition-colors"
+            >
+              <Flag className="w-3.5 h-3.5" />
+              Denunciar este prestador
+            </button>
+          ) : (
+            <p className="text-center text-xs text-green-600">Denúncia enviada. Obrigado!</p>
+          )}
+
+          {/* Mensagem direta */}
+          <Link
+            href={`/dashboard/mensagens/${provider.id}`}
+            className="flex items-center justify-center gap-2 w-full bg-white border border-gray-200 hover:border-orange-300 hover:bg-orange-50 text-gray-700 hover:text-orange-600 font-medium text-sm px-4 py-3 rounded-2xl transition-colors shadow-sm"
+          >
+            <MessageSquare className="w-4 h-4" />
+            Enviar mensagem
+          </Link>
+
           {/* Solicitar */}
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 space-y-3">
             <h3 className="font-semibold text-slate-900 text-sm flex items-center gap-2">
               <Zap className="w-4 h-4 text-orange-500" />Solicitar atendimento
             </h3>
+            {provider.tipos_servico.length > 1 && (
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Tipo de serviço</label>
+                <select
+                  value={tipoServico}
+                  onChange={e => setTipoServico(e.target.value)}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
+                >
+                  {provider.tipos_servico.map(tipo => (
+                    <option key={tipo} value={tipo}>
+                      {TIPOS_SERVICO_LABELS[tipo as TipoServico] ?? tipo}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             <textarea
               value={observacao}
               onChange={e => setObservacao(e.target.value)}

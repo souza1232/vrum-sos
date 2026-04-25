@@ -197,23 +197,23 @@ export default function PainelPage() {
 
           {/* Mini stats */}
           {provider.status_aprovacao === 'aprovado' && (
-            <div className="grid grid-cols-3 gap-4">
-              <div className="bg-white border border-gray-200 shadow-sm rounded-2xl p-5 text-center">
-                <p className="text-3xl font-black text-slate-900">{requestStats.total}</p>
-                <p className="text-xs text-gray-500 font-medium mt-1 flex items-center justify-center gap-1">
-                  <FileText className="w-3.5 h-3.5" />
-                  Total de solicitações
+            <div className="grid grid-cols-3 gap-2 sm:gap-4">
+              <div className="bg-white border border-gray-200 shadow-sm rounded-2xl p-3 sm:p-5 text-center">
+                <p className="text-xl sm:text-3xl font-black text-slate-900">{requestStats.total}</p>
+                <p className="text-xs text-gray-500 font-medium mt-1 flex items-center justify-center gap-1 leading-tight">
+                  <FileText className="w-3 h-3 flex-shrink-0" />
+                  <span>Total</span>
                 </p>
               </div>
-              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 text-center">
-                <p className="text-3xl font-black text-amber-700">{requestStats.pendente}</p>
-                <p className="text-xs text-amber-600 font-medium mt-1">Aguardando resposta</p>
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 sm:p-5 text-center">
+                <p className="text-xl sm:text-3xl font-black text-amber-700">{requestStats.pendente}</p>
+                <p className="text-xs text-amber-600 font-medium mt-1 leading-tight">Aguardando</p>
               </div>
-              <div className="bg-green-50 border border-green-200 rounded-2xl p-5 text-center">
-                <p className="text-3xl font-black text-green-700">{requestStats.concluido}</p>
-                <p className="text-xs text-green-600 font-medium mt-1 flex items-center justify-center gap-1">
-                  <TrendingUp className="w-3.5 h-3.5" />
-                  Concluídos
+              <div className="bg-green-50 border border-green-200 rounded-2xl p-3 sm:p-5 text-center">
+                <p className="text-xl sm:text-3xl font-black text-green-700">{requestStats.concluido}</p>
+                <p className="text-xs text-green-600 font-medium mt-1 flex items-center justify-center gap-1 leading-tight">
+                  <TrendingUp className="w-3 h-3 flex-shrink-0" />
+                  <span>Feitos</span>
                 </p>
               </div>
             </div>
@@ -361,25 +361,31 @@ export default function PainelPage() {
                         </label>
                       ))}
                     </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      <Input
-                        label="Início"
-                        type="time"
-                        value={form.horario_inicio ?? ''}
-                        onChange={e => setForm({ ...form, horario_inicio: e.target.value })}
-                      />
-                      <Input
-                        label="Fim"
-                        type="time"
-                        value={form.horario_fim ?? ''}
-                        onChange={e => setForm({ ...form, horario_fim: e.target.value })}
-                      />
-                      <Input
-                        label="Raio (km)"
-                        type="number"
-                        value={form.raio_km ?? 20}
-                        onChange={e => setForm({ ...form, raio_km: parseInt(e.target.value) })}
-                      />
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <div className="col-span-1 sm:col-span-1">
+                        <Input
+                          label="Início"
+                          type="time"
+                          value={form.horario_inicio ?? ''}
+                          onChange={e => setForm({ ...form, horario_inicio: e.target.value })}
+                        />
+                      </div>
+                      <div className="col-span-1 sm:col-span-1">
+                        <Input
+                          label="Fim"
+                          type="time"
+                          value={form.horario_fim ?? ''}
+                          onChange={e => setForm({ ...form, horario_fim: e.target.value })}
+                        />
+                      </div>
+                      <div className="col-span-1 sm:col-span-1">
+                        <Input
+                          label="Raio (km)"
+                          type="number"
+                          value={form.raio_km ?? 20}
+                          onChange={e => setForm({ ...form, raio_km: parseInt(e.target.value) })}
+                        />
+                      </div>
                     </div>
                   </div>
                 ) : (

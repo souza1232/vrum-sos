@@ -9,6 +9,7 @@ import { z } from 'zod'
 import { createClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import { useEmail } from '@/hooks/useEmail'
 import { UserPlus } from 'lucide-react'
 
 const schema = z
@@ -28,6 +29,7 @@ type FormData = z.infer<typeof schema>
 export default function RegisterPage() {
   const router = useRouter()
   const supabase = createClient()
+  const { sendWelcomeEmail } = useEmail()
   const [erro, setErro] = useState('')
   const [sucesso, setSucesso] = useState(false)
 
@@ -39,6 +41,8 @@ export default function RegisterPage() {
 
   async function onSubmit(data: FormData) {
     setErro('')
+
+    // Criar conta no Supabase
     const { error } = await supabase.auth.signUp({
       email: data.email,
       password: data.senha,
@@ -57,6 +61,14 @@ export default function RegisterPage() {
         setErro('Erro ao criar conta. Tente novamente.')
       }
       return
+    }
+
+    // Enviar email de boas-vindas (não bloqueia o cadastro se falhar)
+    try {
+      await sendWelcomeEmail(data.email, data.nome)
+    } catch (emailError) {
+      console.warn('Erro ao enviar email de boas-vindas:', emailError)
+      // Continue normalmente - email é opcional
     }
 
     setSucesso(true)
@@ -82,12 +94,12 @@ export default function RegisterPage() {
 
   return (
     <div className="w-full max-w-md">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-        <div className="mb-8">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 sm:p-8">
+        <div className="mb-6 sm:mb-8">
           <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-4">
             <UserPlus className="w-6 h-6 text-orange-600" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900">Criar conta gratuita</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Criar conta gratuita</h1>
           <p className="text-gray-500 mt-1">Encontre prestadores na sua região.</p>
         </div>
 

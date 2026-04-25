@@ -8,6 +8,7 @@ import ProviderCard from '@/components/provider/ProviderCard'
 import ProviderFiltersComponent from '@/components/provider/ProviderFilters'
 import ProviderMapWrapper from '@/components/map/ProviderMapWrapper'
 import SkeletonCard from '@/components/ui/SkeletonCard'
+import LooviCarousel from '@/components/ui/LooviCarousel'
 import { SearchX, Wrench, LayoutGrid, Map } from 'lucide-react'
 import { haversineDistance } from '@/lib/utils'
 
@@ -96,8 +97,12 @@ export default function DashboardPage() {
         enriched = enriched.filter(p => (p.avg_rating ?? 0) >= filters.min_rating!)
       }
 
-      // Ordenar por distância se GPS ativo
+      // Quando GPS ativo: filtra pelo raio de atendimento e ordena por distância
       if (filters.userLat && filters.userLng) {
+        enriched = enriched.filter(p => {
+          if (!p.latitude || !p.longitude || p.distance_km === undefined) return true
+          return p.distance_km <= p.raio_km
+        })
         enriched.sort((a, b) => {
           const da = a.distance_km ?? Infinity
           const db = b.distance_km ?? Infinity
@@ -148,6 +153,11 @@ export default function DashboardPage() {
           Olá, {profile?.nome?.split(' ')[0] ?? 'usuário'} 👋
         </h1>
         <p className="text-gray-500 mt-1">Encontre o prestador automotivo que você precisa.</p>
+      </div>
+
+      {/* Banner Loovi */}
+      <div className="mb-6">
+        <LooviCarousel />
       </div>
 
       {/* Filtros */}
@@ -226,7 +236,7 @@ export default function DashboardPage() {
                     : [-15.7801, -47.9292]
                 }
                 zoom={activeFilters.userLat ? 10 : 5}
-                className="h-[600px] rounded-2xl overflow-hidden border border-gray-200 shadow-sm"
+                className="h-[350px] sm:h-[600px] rounded-2xl overflow-hidden border border-gray-200 shadow-sm"
               />
             </div>
           )}

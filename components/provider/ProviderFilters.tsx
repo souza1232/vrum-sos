@@ -71,7 +71,7 @@ export default function ProviderFiltersComponent({ onFilter, loading }: Provider
         {userCoords && (
           <span className="ml-auto inline-flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-200">
             <Navigation className="w-3 h-3" />
-            Ordenando por distância
+            Filtrando por raio de atendimento
           </span>
         )}
       </div>
