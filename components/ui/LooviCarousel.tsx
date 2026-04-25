@@ -33,7 +33,7 @@ export default function LooviCarousel() {
   }
 
   return (
-    <div className="relative w-full max-w-sm mx-auto">
+    <div className="relative w-full max-w-[240px] sm:max-w-sm mx-auto">
       {/* Card do banner */}
       <div className="relative rounded-2xl overflow-hidden shadow-lg bg-[#6B72F5]" style={{ aspectRatio: '3/4' }}>
 
