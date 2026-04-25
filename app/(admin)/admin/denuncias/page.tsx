@@ -56,8 +56,8 @@ export default function AdminDenunciasPage() {
 
       if (!reportsData) return
 
-      const providerIds = [...new Set(reportsData.map(r => r.provider_id))]
-      const userIds = [...new Set(reportsData.map(r => r.user_id))]
+      const providerIds = Array.from(new Set(reportsData.map(r => r.provider_id)))
+      const userIds = Array.from(new Set(reportsData.map(r => r.user_id)))
 
       const [{ data: providers }, { data: users }] = await Promise.all([
         supabase.from('providers').select('id, nome').in('id', providerIds),
