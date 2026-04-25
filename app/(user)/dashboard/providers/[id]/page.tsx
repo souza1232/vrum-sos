@@ -78,7 +78,7 @@ export default function ProviderDetailPage() {
       const { error } = await supabase.from('service_requests').insert({
         user_id: profile.id,
         provider_id: provider.id,
-        tipo_servico: tipoServico || provider.tipos_servico[0] ?? 'mecanico',
+        tipo_servico: tipoServico || (provider.tipos_servico[0] ?? 'mecanico'),
         cidade: provider.cidade,
         observacao: observacao || null,
         status: 'pendente',
