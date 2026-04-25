@@ -36,7 +36,7 @@ export default function LooviCarousel() {
   return (
     <div className="relative w-full max-w-sm mx-auto">
       {/* Card do banner */}
-      <div className="relative rounded-2xl overflow-hidden shadow-lg bg-[#6B72F5] aspect-video sm:aspect-[3/4]">
+      <div className="relative rounded-2xl overflow-hidden shadow-lg bg-[#6B72F5] aspect-[3/4]">
 
         {/* Imagens */}
         {banners.map((banner, i) => (
@@ -48,7 +48,7 @@ export default function LooviCarousel() {
               src={banner.src}
               alt={banner.alt}
               fill
-              className="object-cover object-top"
+              className="object-contain"
               priority={i === 0}
               sizes="(max-width: 768px) 100vw, 400px"
             />
