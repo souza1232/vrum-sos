@@ -25,18 +25,25 @@ export default function LooviCarousel() {
 
   function prev(e: React.MouseEvent) {
     e.preventDefault()
+    e.stopPropagation()
     setCurrent(prev => (prev - 1 + banners.length) % banners.length)
   }
 
   function next(e: React.MouseEvent) {
     e.preventDefault()
+    e.stopPropagation()
     setCurrent(prev => (prev + 1) % banners.length)
   }
 
   return (
     <div className="relative w-full">
       {/* Card do banner */}
-      <div className="relative rounded-2xl overflow-hidden shadow-lg bg-[#6B72F5] h-52 sm:h-64 lg:h-72">
+      <a
+        href={LOOVI_LINK}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block relative rounded-2xl overflow-hidden shadow-lg bg-[#6B72F5] h-52 sm:h-64 lg:h-72 cursor-pointer"
+      >
 
         {/* Imagens */}
         {banners.map((banner, i) => (
@@ -82,17 +89,12 @@ export default function LooviCarousel() {
 
         {/* CTA */}
         <div className="absolute bottom-3 right-3 z-10">
-          <a
-            href={LOOVI_LINK}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 bg-white/90 hover:bg-white text-[#6B72F5] font-semibold px-3 py-1.5 rounded-lg text-xs shadow transition-colors active:scale-95"
-          >
+          <span className="flex items-center gap-1.5 bg-white/90 text-[#6B72F5] font-semibold px-3 py-1.5 rounded-lg text-xs shadow">
             <ExternalLink className="w-3 h-3" />
             Saiba mais
-          </a>
+          </span>
         </div>
-      </div>
+      </a>
     </div>
   )
 }
