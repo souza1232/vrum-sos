@@ -137,7 +137,7 @@ function BuscarContent() {
         </div>
       </div>
 
-      {/* BANNER LOOVI */}
+      {/* BANNER LOOVI — largura total */}
       <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6">
         <LooviCarousel />
       </div>
@@ -174,98 +174,98 @@ function BuscarContent() {
             <p className="text-sm text-gray-500 mb-4">{providers.length} prestador(es) encontrado(s)</p>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
               {providers.map(p => {
-                const wLink = p.whatsapp ? whatsappLink(p.whatsapp, `Olá ${p.nome}, vi seu perfil no Vrum SOS e preciso de ajuda!`) : null
-                return (
-                  <div key={p.id} className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                    {/* Header */}
-                    <div className="bg-gradient-to-r from-slate-800 to-slate-700 px-5 py-4 flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-orange-500 flex items-center justify-center relative">
-                        {p.foto_url ? (
-                          <Image src={p.foto_url} alt={p.nome} fill className="object-cover" unoptimized />
-                        ) : (
-                          <span className="text-white font-black text-xl">{p.nome.charAt(0)}</span>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-white text-sm truncate">{p.nome}</p>
-                        {p.nome_empresa && <p className="text-gray-300 text-xs truncate">{p.nome_empresa}</p>}
-                        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                          <span className="text-gray-400 text-xs flex items-center gap-1">
-                            {p.tipo_prestador === 'empresa' ? <Building2 className="w-3 h-3" /> : <User className="w-3 h-3" />}
-                            {p.tipo_prestador === 'empresa' ? 'Empresa' : 'Autônomo'}
-                          </span>
-                          <span className="text-gray-400 text-xs flex items-center gap-1">
-                            <MapPin className="w-3 h-3" />{p.cidade}
-                          </span>
+                    const wLink = p.whatsapp ? whatsappLink(p.whatsapp, `Olá ${p.nome}, vi seu perfil no Vrum SOS e preciso de ajuda!`) : null
+                    return (
+                      <div key={p.id} className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                        {/* Header */}
+                        <div className="bg-gradient-to-r from-slate-800 to-slate-700 px-5 py-4 flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-orange-500 flex items-center justify-center relative">
+                            {p.foto_url ? (
+                              <Image src={p.foto_url} alt={p.nome} fill className="object-cover" unoptimized />
+                            ) : (
+                              <span className="text-white font-black text-xl">{p.nome.charAt(0)}</span>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-bold text-white text-sm truncate">{p.nome}</p>
+                            {p.nome_empresa && <p className="text-gray-300 text-xs truncate">{p.nome_empresa}</p>}
+                            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                              <span className="text-gray-400 text-xs flex items-center gap-1">
+                                {p.tipo_prestador === 'empresa' ? <Building2 className="w-3 h-3" /> : <User className="w-3 h-3" />}
+                                {p.tipo_prestador === 'empresa' ? 'Empresa' : 'Autônomo'}
+                              </span>
+                              <span className="text-gray-400 text-xs flex items-center gap-1">
+                                <MapPin className="w-3 h-3" />{p.cidade}
+                              </span>
+                            </div>
+                          </div>
+                          {p.avg_rating && (
+                            <div className="flex items-center gap-1 flex-shrink-0">
+                              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                              <span className="text-amber-300 text-xs font-semibold">{p.avg_rating.toFixed(1)}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Serviços */}
+                        <div className="px-5 py-3 border-b border-gray-100">
+                          <div className="flex flex-wrap gap-1.5">
+                            {p.tipos_servico?.slice(0, 3).map((t: string) => (
+                              <span key={t} className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-medium">
+                                {TIPOS_SERVICO_LABELS[t as TipoServico] ?? t}
+                              </span>
+                            ))}
+                            {p.tipos_servico?.length > 3 && (
+                              <span className="text-xs text-gray-400">+{p.tipos_servico.length - 3}</span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Info */}
+                        <div className="px-5 py-3 flex items-center gap-3 text-xs text-gray-500">
+                          {p.atende_24h && <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-green-500" />24h</span>}
+                          <span><MapPin className="w-3 h-3 inline mr-0.5" />Raio {p.raio_km}km</span>
+                        </div>
+
+                        {/* Botões */}
+                        <div className="px-5 pb-5 flex gap-2">
+                          {wLink && (
+                            <a
+                              href={wLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex-1 flex items-center justify-center gap-1.5 bg-green-500 hover:bg-green-600 text-white font-semibold text-xs py-2.5 rounded-xl transition-colors"
+                            >
+                              <MessageCircle className="w-3.5 h-3.5" />
+                              WhatsApp
+                            </a>
+                          )}
+                          {p.telefone && (
+                            <a
+                              href={`tel:${p.telefone}`}
+                              className="flex-1 flex items-center justify-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold text-xs py-2.5 rounded-xl transition-colors"
+                            >
+                              <Phone className="w-3.5 h-3.5" />
+                              Ligar
+                            </a>
+                          )}
                         </div>
                       </div>
-                      {p.avg_rating && (
-                        <div className="flex items-center gap-1 flex-shrink-0">
-                          <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                          <span className="text-amber-300 text-xs font-semibold">{p.avg_rating.toFixed(1)}</span>
-                        </div>
-                      )}
-                    </div>
+                    )
+                  })}
+                </div>
 
-                    {/* Serviços */}
-                    <div className="px-5 py-3 border-b border-gray-100">
-                      <div className="flex flex-wrap gap-1.5">
-                        {p.tipos_servico?.slice(0, 3).map((t: string) => (
-                          <span key={t} className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-medium">
-                            {TIPOS_SERVICO_LABELS[t as TipoServico] ?? t}
-                          </span>
-                        ))}
-                        {p.tipos_servico?.length > 3 && (
-                          <span className="text-xs text-gray-400">+{p.tipos_servico.length - 3}</span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Info */}
-                    <div className="px-5 py-3 flex items-center gap-3 text-xs text-gray-500">
-                      {p.atende_24h && <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-green-500" />24h</span>}
-                      <span><MapPin className="w-3 h-3 inline mr-0.5" />Raio {p.raio_km}km</span>
-                    </div>
-
-                    {/* Botões */}
-                    <div className="px-5 pb-5 flex gap-2">
-                      {wLink && (
-                        <a
-                          href={wLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-1 flex items-center justify-center gap-1.5 bg-green-500 hover:bg-green-600 text-white font-semibold text-xs py-2.5 rounded-xl transition-colors"
-                        >
-                          <MessageCircle className="w-3.5 h-3.5" />
-                          WhatsApp
-                        </a>
-                      )}
-                      {p.telefone && (
-                        <a
-                          href={`tel:${p.telefone}`}
-                          className="flex-1 flex items-center justify-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold text-xs py-2.5 rounded-xl transition-colors"
-                        >
-                          <Phone className="w-3.5 h-3.5" />
-                          Ligar
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-
-            {/* CTA cadastro */}
-            <div className="mt-10 bg-slate-900 rounded-2xl p-6 text-center">
-              <p className="text-white font-semibold mb-1">Quer mais recursos?</p>
-              <p className="text-gray-400 text-sm mb-4">Crie uma conta grátis para enviar mensagens, avaliar prestadores e muito mais.</p>
-              <Link href="/register" className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-xl text-sm transition-colors">
-                Criar conta grátis
-              </Link>
-            </div>
-          </>
-        )}
-      </div>
+                {/* CTA cadastro */}
+                <div className="mt-10 bg-slate-900 rounded-2xl p-6 text-center">
+                  <p className="text-white font-semibold mb-1">Quer mais recursos?</p>
+                  <p className="text-gray-400 text-sm mb-4">Crie uma conta grátis para enviar mensagens, avaliar prestadores e muito mais.</p>
+                  <Link href="/register" className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-xl text-sm transition-colors">
+                    Criar conta grátis
+                  </Link>
+                </div>
+              </>
+            )}
+          </div>
 
       <Footer />
     </div>

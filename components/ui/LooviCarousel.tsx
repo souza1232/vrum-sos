@@ -34,9 +34,9 @@ export default function LooviCarousel() {
   }
 
   return (
-    <div className="relative w-full max-w-sm mx-auto">
+    <div className="relative w-full">
       {/* Card do banner */}
-      <div className="relative rounded-2xl overflow-hidden shadow-lg bg-[#6B72F5] aspect-[3/4]">
+      <div className="relative rounded-2xl overflow-hidden shadow-lg bg-[#6B72F5] h-52 sm:h-64 lg:h-72">
 
         {/* Imagens */}
         {banners.map((banner, i) => (
@@ -48,7 +48,7 @@ export default function LooviCarousel() {
               src={banner.src}
               alt={banner.alt}
               fill
-              className="object-contain"
+              className="object-cover"
               priority={i === 0}
               sizes="(max-width: 768px) 100vw, 400px"
             />
@@ -70,7 +70,7 @@ export default function LooviCarousel() {
         </button>
 
         {/* Indicadores */}
-        <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
           {banners.map((_, i) => (
             <button
               key={i}
