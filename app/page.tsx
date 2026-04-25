@@ -18,12 +18,12 @@ import Footer from '@/components/layout/Footer'
 import CarAnimation from '@/components/ui/CarAnimation'
 
 const servicos = [
-  { icon: Wrench, label: 'Mecânico', cor: 'bg-blue-500' },
-  { icon: ElectricIcon, label: 'Eletricista Auto', cor: 'bg-yellow-500' },
-  { icon: Key, label: 'Chaveiro', cor: 'bg-purple-500' },
-  { icon: Circle, label: 'Borracheiro', cor: 'bg-green-500' },
-  { icon: Truck, label: 'Guincho', cor: 'bg-red-500' },
-  { icon: Truck, label: 'Guincho Pesado', cor: 'bg-orange-500' },
+  { icon: Wrench, label: 'Mecânico', cor: 'bg-blue-500', tipo: 'mecanico' },
+  { icon: ElectricIcon, label: 'Eletricista Auto', cor: 'bg-yellow-500', tipo: 'eletricista' },
+  { icon: Key, label: 'Chaveiro', cor: 'bg-purple-500', tipo: 'chaveiro' },
+  { icon: Circle, label: 'Borracheiro', cor: 'bg-green-500', tipo: 'borracheiro' },
+  { icon: Truck, label: 'Guincho', cor: 'bg-red-500', tipo: 'guincho' },
+  { icon: Truck, label: 'Guincho Pesado', cor: 'bg-orange-500', tipo: 'guincho_pesado' },
 ]
 
 const diferenciais = [
@@ -159,26 +159,30 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
-              Todos os serviços que você precisa
+              Qual serviço você precisa?
             </h2>
             <p className="text-lg text-gray-500 max-w-xl mx-auto">
-              De pequenos reparos a emergências na estrada — temos o especialista certo para você.
+              Clique no serviço e veja os prestadores disponíveis agora — sem cadastro!
             </p>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
             {servicos.map((s) => (
-              <div
+              <Link
                 key={s.label}
-                className="group flex flex-col items-center gap-3 p-5 rounded-2xl border border-gray-100 bg-white hover:border-orange-200 hover:bg-orange-50 transition-all cursor-default"
+                href={`/buscar?tipo=${s.tipo}`}
+                className="group flex flex-col items-center gap-3 p-5 rounded-2xl border border-gray-100 bg-white hover:border-orange-300 hover:bg-orange-50 hover:shadow-md transition-all"
               >
-                <div className={`w-12 h-12 ${s.cor} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                  <s.icon className="w-6 h-6 text-white" />
+                <div className={`w-14 h-14 ${s.cor} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm`}>
+                  <s.icon className="w-7 h-7 text-white" />
                 </div>
-                <span className="text-sm font-semibold text-gray-700 text-center leading-tight">
+                <span className="text-sm font-semibold text-gray-700 text-center leading-tight group-hover:text-orange-600 transition-colors">
                   {s.label}
                 </span>
-              </div>
+                <span className="text-xs text-orange-500 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                  Ver prestadores →
+                </span>
+              </Link>
             ))}
           </div>
         </div>
