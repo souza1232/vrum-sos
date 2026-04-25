@@ -114,13 +114,19 @@ export default function HomePage() {
                 perto de você, agora mesmo. Rápido, confiável e verificado.
               </p>
 
+              <Link
+                href="/buscar"
+                className="inline-flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-black px-8 py-4 rounded-xl text-lg transition-all hover:shadow-lg hover:shadow-orange-500/30 active:scale-95 w-full sm:w-auto mb-4"
+              >
+                Buscar prestador agora
+                <ArrowRight className="w-5 h-5" />
+              </Link>
               <div className="flex flex-col sm:flex-row flex-wrap gap-3">
                 <Link
                   href="/register"
-                  className="inline-flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3.5 sm:px-8 sm:py-4 rounded-xl text-base transition-all hover:shadow-lg hover:shadow-orange-500/30 active:scale-95"
+                  className="inline-flex items-center justify-center gap-2 border-2 border-slate-600 hover:border-slate-400 text-gray-300 hover:text-white font-semibold px-6 py-3.5 sm:px-8 sm:py-4 rounded-xl text-base transition-colors"
                 >
-                  Começar agora
-                  <ArrowRight className="w-5 h-5" />
+                  Criar conta grátis
                 </Link>
                 <Link
                   href="/login"
