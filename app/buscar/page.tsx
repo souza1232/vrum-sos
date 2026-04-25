@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { TIPOS_SERVICO_LABELS, TipoServico } from '@/types'
 import Footer from '@/components/layout/Footer'
+import LooviCarousel from '@/components/ui/LooviCarousel'
 import {
   Zap, Search, MapPin, Phone, MessageCircle, Star,
   Building2, User, Clock, Filter, X
@@ -134,6 +135,11 @@ function BuscarContent() {
             </button>
           </form>
         </div>
+      </div>
+
+      {/* BANNER LOOVI */}
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6">
+        <LooviCarousel />
       </div>
 
       {/* RESULTADOS */}
