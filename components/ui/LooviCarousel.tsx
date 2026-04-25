@@ -7,9 +7,10 @@ import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
 const LOOVI_LINK = 'https://loovi.com.br/52489/Q0FUX0FERVNBT18yOTk=?utm_source=escvir&utm_medium=meusite'
 
 const banners = [
-  { src: '/banners/loovi-1.png', alt: 'Loovi Seguro Auto - Seguro completo até 50% mais barato' },
-  { src: '/banners/loovi-2.png', alt: 'Loovi Seguro Auto - Por que o seguro da Loovi foi feito para você?' },
-  { src: '/banners/loovi-3.png', alt: 'Loovi Seguro Auto - Neymar Jr.' },
+  { src: '/banners/loovi-1.png', alt: 'Loovi Seguro Auto - Banner 1' },
+  { src: '/banners/loovi-2.png', alt: 'Loovi Seguro Auto - Banner 2' },
+  { src: '/banners/loovi-3.png', alt: 'Loovi Seguro Auto - Banner 3' },
+  { src: '/banners/loovi-4.png', alt: 'Loovi Seguro Auto - Banner 4' },
 ]
 
 export default function LooviCarousel() {
