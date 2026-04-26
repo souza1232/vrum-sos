@@ -93,12 +93,20 @@ export default function CidadePage({ params }: { params: { cidade: string } }) {
     })),
   }
 
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Início', item: 'https://vrumsos.com.br' },
+      { '@type': 'ListItem', position: 2, name: 'Serviços por cidade', item: 'https://vrumsos.com.br/servicos' },
+      { '@type': 'ListItem', position: 3, name: nomeCidade, item: `https://vrumsos.com.br/servicos/${params.cidade}` },
+    ],
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
       {/* NAVBAR */}
       <nav className="bg-slate-900 border-b border-slate-800 sticky top-0 z-40">

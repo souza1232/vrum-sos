@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
@@ -39,6 +39,7 @@ async function geocodificarCidade(cidade: string): Promise<{ lat: number; lng: n
 
 function BuscarContent() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const supabase = createClient()
 
   const [cidade, setCidade] = useState(searchParams.get('cidade') ?? '')
@@ -64,6 +65,12 @@ function BuscarContent() {
     const cidadeEfetiva = override?.cidade !== undefined ? override.cidade : cidade
     const tipoEfetivo = override?.tipoServico !== undefined ? override.tipoServico : tipoServico
     const coordsOverride = override && 'coords' in override ? override.coords : undefined
+
+    // Sincronizar filtros na URL para links compartilháveis
+    const qs = new URLSearchParams()
+    if (tipoEfetivo) qs.set('tipo', tipoEfetivo)
+    if (cidadeEfetiva.trim()) qs.set('cidade', cidadeEfetiva.trim())
+    router.replace(`/buscar${qs.toString() ? `?${qs.toString()}` : ''}`, { scroll: false })
 
     try {
       // Resolver coordenadas do cliente
