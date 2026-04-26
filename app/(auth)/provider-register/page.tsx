@@ -51,7 +51,7 @@ type FormData = z.infer<typeof schema>
 export default function ProviderRegisterPage() {
   const router = useRouter()
   const supabase = createClient()
-  const { sendProviderStatusEmail } = useEmail()
+  const { sendProviderStatusEmail, sendAdminNotification } = useEmail()
   const [erro, setErro] = useState('')
   const [sucesso, setSucesso] = useState(false)
   const [etapa, setEtapa] = useState(1)
@@ -180,16 +180,24 @@ export default function ProviderRegisterPage() {
       return
     }
 
-    // Enviar email de cadastro pendente (não bloqueia se falhar)
+    // Enviar emails em paralelo (não bloqueia se falhar)
     try {
-      await sendProviderStatusEmail(
-        data.email,
-        data.nome,
-        'pending',
-        data.nome_empresa || undefined
-      )
+      const servicosLabel = (data.tipos_servico as string[])
+        .map(s => TIPOS_SERVICO_LABELS[s as TipoServico] ?? s)
+        .join(', ')
+
+      await Promise.allSettled([
+        sendProviderStatusEmail(data.email, data.nome, 'pending', data.nome_empresa || undefined),
+        sendAdminNotification({
+          nome: data.nome,
+          nomeEmpresa: data.nome_empresa || undefined,
+          cidade: data.cidade,
+          estado: data.estado,
+          servicos: servicosLabel,
+        }),
+      ])
     } catch (emailError) {
-      console.warn('Erro ao enviar email de confirmação:', emailError)
+      console.warn('Erro ao enviar emails:', emailError)
     }
 
     setSucesso(true)

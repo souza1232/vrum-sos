@@ -171,6 +171,56 @@ export const emailTemplates = {
     `
   }),
 
+  adminNewProvider: (nome: string, nomeEmpresa: string | undefined, cidade: string, estado: string, servicos: string, adminUrl: string) => ({
+    subject: `🔔 Novo prestador aguardando aprovação: ${nomeEmpresa || nome}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: #0f172a; padding: 20px; border-radius: 12px 12px 0 0; text-align: center;">
+          <span style="color: #f97316; font-size: 28px; font-weight: 900;">Vrum SOS</span>
+          <p style="color: #94a3b8; margin: 4px 0 0 0; font-size: 14px;">Painel Administrativo</p>
+        </div>
+
+        <div style="border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px; padding: 30px;">
+          <div style="background: #fff7ed; border-left: 4px solid #f97316; padding: 16px; border-radius: 0 8px 8px 0; margin-bottom: 24px;">
+            <h2 style="margin: 0; color: #ea580c; font-size: 18px;">🔔 Novo prestador cadastrado</h2>
+            <p style="margin: 4px 0 0 0; color: #9a3412; font-size: 14px;">Aguardando sua aprovação</p>
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+              <td style="padding: 10px 0; color: #94a3b8; font-size: 14px; width: 130px;">Nome</td>
+              <td style="padding: 10px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${nome}</td>
+            </tr>
+            ${nomeEmpresa ? `
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+              <td style="padding: 10px 0; color: #94a3b8; font-size: 14px;">Empresa</td>
+              <td style="padding: 10px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${nomeEmpresa}</td>
+            </tr>` : ''}
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+              <td style="padding: 10px 0; color: #94a3b8; font-size: 14px;">Cidade</td>
+              <td style="padding: 10px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${cidade}, ${estado}</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px 0; color: #94a3b8; font-size: 14px;">Serviços</td>
+              <td style="padding: 10px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${servicos}</td>
+            </tr>
+          </table>
+
+          <div style="text-align: center;">
+            <a href="${adminUrl}"
+               style="background: #f97316; color: white; padding: 14px 32px; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 15px; display: inline-block;">
+              Aprovar ou reprovar no painel →
+            </a>
+          </div>
+
+          <p style="color: #94a3b8; font-size: 13px; text-align: center; margin-top: 24px;">
+            Acesse o painel admin para revisar os dados completos antes de aprovar.
+          </p>
+        </div>
+      </div>
+    `
+  }),
+
   serviceRequest: (prestadorNome: string, usuarioNome: string, tipoServico: string, cidade: string, observacao?: string) => ({
     subject: '🚗 Nova solicitação de atendimento - Vrum SOS',
     html: `

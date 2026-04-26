@@ -11,6 +11,13 @@ interface UseEmailReturn {
     cidade: string
     observacao?: string
   }) => Promise<boolean>
+  sendAdminNotification: (data: {
+    nome: string
+    nomeEmpresa?: string
+    cidade: string
+    estado: string
+    servicos: string
+  }) => Promise<boolean>
   isLoading: boolean
   error: string | null
 }
@@ -73,10 +80,21 @@ export const useEmail = (): UseEmailReturn => {
     return sendRequest('service-request', data)
   }
 
+  const sendAdminNotification = async (data: {
+    nome: string
+    nomeEmpresa?: string
+    cidade: string
+    estado: string
+    servicos: string
+  }): Promise<boolean> => {
+    return sendRequest('admin-notify', data)
+  }
+
   return {
     sendWelcomeEmail,
     sendProviderStatusEmail,
     sendServiceRequestEmail,
+    sendAdminNotification,
     isLoading,
     error
   }
