@@ -14,7 +14,8 @@ import PhotoUpload from '@/components/upload/PhotoUpload'
 import { geocodeCity } from '@/lib/geocoding'
 import {
   Wrench, Clock, MapPin, Phone, MessageCircle,
-  AlertCircle, CheckCircle, Edit3, Save, X, FileText, TrendingUp, Camera
+  AlertCircle, CheckCircle, Edit3, Save, X, FileText, TrendingUp, Camera,
+  LocateFixed, Loader2, Navigation
 } from 'lucide-react'
 
 export default function PainelPage() {
@@ -25,6 +26,7 @@ export default function PainelPage() {
   const [editMode, setEditMode] = useState(false)
   const [saving, setSaving] = useState(false)
   const [requestStats, setRequestStats] = useState({ total: 0, pendente: 0, concluido: 0 })
+  const [locLoading, setLocLoading] = useState(false)
   const { showToast, ToastComponent } = useToast()
 
   // Form state para edição
@@ -121,6 +123,51 @@ export default function PainelPage() {
     }
   }
 
+  async function salvarCoordenadas(lat: number, lng: number) {
+    if (!provider) return
+    const { error } = await supabase
+      .from('providers')
+      .update({ latitude: lat, longitude: lng })
+      .eq('id', provider.id)
+    if (error) {
+      showToast('Erro ao salvar localização.', 'error')
+    } else {
+      setProvider({ ...provider, latitude: lat, longitude: lng })
+      showToast('Localização confirmada! Você agora aparece nas buscas por proximidade.', 'success')
+    }
+  }
+
+  async function confirmarViaGPS() {
+    if (!navigator.geolocation) {
+      showToast('Seu navegador não suporta GPS. Use a cidade do cadastro.', 'error')
+      return
+    }
+    setLocLoading(true)
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        await salvarCoordenadas(pos.coords.latitude, pos.coords.longitude)
+        setLocLoading(false)
+      },
+      () => {
+        showToast('Permissão negada. Tente usar a cidade do cadastro.', 'error')
+        setLocLoading(false)
+      },
+      { timeout: 10000 }
+    )
+  }
+
+  async function confirmarViaCidade() {
+    if (!provider) return
+    setLocLoading(true)
+    const coords = await geocodeCity(provider.cidade, provider.estado)
+    if (coords) {
+      await salvarCoordenadas(coords.lat, coords.lng)
+    } else {
+      showToast('Não foi possível identificar sua cidade. Verifique o cadastro.', 'error')
+    }
+    setLocLoading(false)
+  }
+
   if (loading) return (
     <ProviderLayout nomeUsuario={profile?.nome} activeTab="painel">
       <PageSpinner />
@@ -213,6 +260,42 @@ export default function PainelPage() {
                   <Camera className="w-3.5 h-3.5" />
                   Adicionar foto agora
                 </button>
+              </div>
+            </div>
+          )}
+
+          {/* Banner sem localização */}
+          {!provider.latitude && !editMode && (
+            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5 flex items-start gap-4">
+              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Navigation className="w-5 h-5 text-blue-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-blue-900">Confirme sua localização</h3>
+                <p className="text-sm text-blue-700 mt-0.5">
+                  Sem localização confirmada você <strong>não aparece nas buscas por proximidade</strong>. Leva menos de 5 segundos.
+                </p>
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <button
+                    onClick={confirmarViaGPS}
+                    disabled={locLoading}
+                    className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
+                  >
+                    {locLoading
+                      ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      : <LocateFixed className="w-3.5 h-3.5" />
+                    }
+                    Usar meu GPS agora
+                  </button>
+                  <button
+                    onClick={confirmarViaCidade}
+                    disabled={locLoading}
+                    className="inline-flex items-center gap-1.5 border border-blue-300 hover:bg-blue-100 disabled:opacity-60 text-blue-700 text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
+                  >
+                    <MapPin className="w-3.5 h-3.5" />
+                    Usar cidade do cadastro ({provider.cidade})
+                  </button>
+                </div>
               </div>
             </div>
           )}
