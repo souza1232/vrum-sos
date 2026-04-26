@@ -15,7 +15,7 @@ import { geocodeCity } from '@/lib/geocoding'
 import {
   Wrench, Clock, MapPin, Phone, MessageCircle,
   AlertCircle, CheckCircle, Edit3, Save, X, FileText, TrendingUp, Camera,
-  LocateFixed, Loader2, Navigation
+  LocateFixed, Loader2, Navigation, Star
 } from 'lucide-react'
 
 export default function PainelPage() {
@@ -241,6 +241,59 @@ export default function PainelPage() {
               </p>
             </div>
           </div>
+
+          {/* Barra de completude do perfil */}
+          {(() => {
+            const itens = [
+              { label: 'Foto de perfil', done: !!provider.foto_url, peso: 25 },
+              { label: 'WhatsApp', done: !!provider.whatsapp, peso: 20 },
+              { label: 'Telefone', done: !!provider.telefone, peso: 15 },
+              { label: 'Descrição', done: !!provider.descricao, peso: 20 },
+              { label: 'Localização', done: !!(provider.latitude && provider.longitude), peso: 10 },
+              { label: 'Serviços cadastrados', done: (provider.tipos_servico?.length ?? 0) > 0, peso: 10 },
+            ]
+            const pct = itens.filter(i => i.done).reduce((s, i) => s + i.peso, 0)
+            const faltando = itens.filter(i => !i.done)
+            const barColor = pct >= 90 ? 'bg-green-500' : pct >= 60 ? 'bg-amber-400' : 'bg-red-400'
+            const textColor = pct >= 90 ? 'text-green-700' : pct >= 60 ? 'text-amber-700' : 'text-red-700'
+            const bgColor = pct >= 90 ? 'bg-green-50 border-green-200' : pct >= 60 ? 'bg-amber-50 border-amber-200' : 'bg-red-50 border-red-200'
+            return (
+              <div className={`rounded-2xl border p-5 ${bgColor}`}>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Star className={`w-4 h-4 ${textColor}`} />
+                    <span className={`font-semibold text-sm ${textColor}`}>Completude do perfil</span>
+                  </div>
+                  <span className={`text-lg font-black ${textColor}`}>{pct}%</span>
+                </div>
+                <div className="w-full bg-white/70 rounded-full h-2.5 mb-3">
+                  <div
+                    className={`h-2.5 rounded-full transition-all duration-500 ${barColor}`}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+                {faltando.length > 0 ? (
+                  <div className="flex flex-wrap gap-2 items-center">
+                    <span className="text-xs text-gray-500">Faltando:</span>
+                    {faltando.map(item => (
+                      <button
+                        key={item.label}
+                        onClick={() => setEditMode(true)}
+                        className="inline-flex items-center gap-1 text-xs font-medium bg-white border border-gray-200 hover:border-orange-400 hover:text-orange-600 text-gray-600 px-2.5 py-1 rounded-full transition-colors"
+                      >
+                        + {item.label}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5 text-xs text-green-700 font-medium">
+                    <CheckCircle className="w-3.5 h-3.5" />
+                    Perfil completo! Você está aparecendo com destaque nas buscas.
+                  </div>
+                )}
+              </div>
+            )
+          })()}
 
           {/* Banner sem foto */}
           {!provider.foto_url && !editMode && (
