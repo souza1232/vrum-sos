@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Script from 'next/script'
 import { Analytics } from '@vercel/analytics/react'
+import ChatWidget from '@/components/ui/ChatWidget'
 import './globals.css'
 
 const APP_URL = 'https://vrumsos.com.br'
@@ -83,6 +84,7 @@ export default function RootLayout({
       `}</Script>
       <body className="antialiased">
         {children}
+        <ChatWidget />
         <Analytics />
       </body>
     </html>
