@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Script from 'next/script'
+import { Analytics } from '@vercel/analytics/react'
 import './globals.css'
 
 const APP_URL = 'https://vrumsos.com.br'
@@ -80,7 +81,10 @@ export default function RootLayout({
         gtag('js', new Date());
         gtag('config', 'G-NYZZP3F1XT');
       `}</Script>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        {children}
+        <Analytics />
+      </body>
     </html>
   )
 }
