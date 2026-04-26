@@ -1,11 +1,67 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { MessageCircle, X, Send, Zap, Loader2 } from 'lucide-react'
+import { MessageCircle, X, Send, Zap } from 'lucide-react'
 
-type Message = {
-  role: 'user' | 'assistant'
-  content: string
+const WHATSAPP_SUPORTE = '557399999999' // substitua pelo seu número
+
+type Message = { role: 'user' | 'assistant'; content: string }
+
+const FAQ: { palavras: string[]; resposta: string }[] = [
+  {
+    palavras: ['mecânico', 'mecanico', 'carro', 'conserto', 'reparo', 'oficina'],
+    resposta: 'Para encontrar um mecânico, acesse a página de busca, selecione "Mecânico" e informe sua cidade ou use o GPS. Você verá os profissionais verificados com WhatsApp para contato direto! 🔧',
+  },
+  {
+    palavras: ['guincho', 'reboque', 'rebocar', 'pane'],
+    resposta: 'Temos guinchos 24h disponíveis! Acesse a busca, selecione "Guincho" e use o GPS para ver os mais próximos. Contato direto pelo WhatsApp do prestador. 🚛',
+  },
+  {
+    palavras: ['borracheiro', 'pneu', 'furado', 'calibragem', 'balanceamento'],
+    resposta: 'Para pneu furado ou calibragem, busque por "Borracheiro" na nossa plataforma. Vários profissionais atendem na estrada e vão até você! 🔵',
+  },
+  {
+    palavras: ['chaveiro', 'chave', 'trancado', 'transponder'],
+    resposta: 'Carro trancado? Busque por "Chaveiro" na plataforma. Profissionais verificados que abrem seu veículo sem danificar a fechadura. 🔑',
+  },
+  {
+    palavras: ['elétric', 'eletric', 'bateria', 'alternador', 'injeção', 'injecao'],
+    resposta: 'Para problemas elétricos, bateria fraca ou injeção eletrônica, busque por "Eletricista Automotivo". Eles fazem diagnóstico com scanner no local! ⚡',
+  },
+  {
+    palavras: ['cadastr', 'prestador', 'anunciar', 'trabalhar', 'registr'],
+    resposta: 'Para se cadastrar como prestador é gratuito! Acesse /provider-register, preencha seus dados e aguarde a aprovação em até 24h. Após aprovado, você aparece nas buscas da sua cidade. 🛠️',
+  },
+  {
+    palavras: ['cidade', 'cidades', 'region', 'região', 'onde', 'atende'],
+    resposta: 'Atendemos: Teixeira de Freitas, Caravelas, Posto da Mata, Alcobaça, Nova Viçosa, Mucuri (BA), Pedro Canário (ES) e Nanuque (MG). Em breve mais cidades! 📍',
+  },
+  {
+    palavras: ['preço', 'preco', 'custo', 'valor', 'quanto', 'pago', 'grátis', 'gratis'],
+    resposta: 'A plataforma é 100% gratuita para quem busca prestadores! O valor do serviço é combinado diretamente com o profissional pelo WhatsApp. 💰',
+  },
+  {
+    palavras: ['funciona', 'como usar', 'como funciona', 'explicar'],
+    resposta: 'Simples: busque o serviço que precisa → veja prestadores verificados → clique no WhatsApp → fale direto com o profissional. Sem cadastro, sem intermediário! ✅',
+  },
+  {
+    palavras: ['avali', 'nota', 'estrela', 'comentário', 'comentario'],
+    resposta: 'Após o atendimento, você pode avaliar o prestador acessando o link /avaliar/[id]. As avaliações ajudam outros motoristas a escolher bem! ⭐',
+  },
+  {
+    palavras: ['aprovação', 'aprovacao', 'analise', 'análise', 'prazo'],
+    resposta: 'O cadastro de prestadores é analisado em até 24 horas. Após aprovado, seu perfil aparece automaticamente nas buscas da sua região! ⏰',
+  },
+]
+
+function responderFAQ(pergunta: string): string {
+  const lower = pergunta.toLowerCase()
+  for (const item of FAQ) {
+    if (item.palavras.some(p => lower.includes(p))) {
+      return item.resposta
+    }
+  }
+  return `Não encontrei uma resposta automática para isso. Para falar com nossa equipe diretamente, clique no botão abaixo ou acesse a busca para encontrar prestadores. 😊`
 }
 
 const MENSAGENS_RAPIDAS = [
@@ -19,7 +75,6 @@ export default function ChatWidget() {
   const [aberto, setAberto] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
-  const [loading, setLoading] = useState(false)
   const [iniciado, setIniciado] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -42,28 +97,17 @@ export default function ChatWidget() {
     if (aberto) setTimeout(() => inputRef.current?.focus(), 100)
   }, [aberto])
 
-  async function enviar(texto?: string) {
+  function enviar(texto?: string) {
     const msg = (texto ?? input).trim()
-    if (!msg || loading) return
+    if (!msg) return
 
-    const novasMensagens: Message[] = [...messages, { role: 'user', content: msg }]
-    setMessages(novasMensagens)
+    const comUsuario: Message[] = [...messages, { role: 'user', content: msg }]
+    setMessages(comUsuario)
     setInput('')
-    setLoading(true)
 
-    try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: novasMensagens }),
-      })
-      const data = await res.json()
-      setMessages(prev => [...prev, { role: 'assistant', content: data.message || 'Desculpe, tente novamente.' }])
-    } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Erro de conexão. Tente novamente em instantes.' }])
-    } finally {
-      setLoading(false)
-    }
+    setTimeout(() => {
+      setMessages(prev => [...prev, { role: 'assistant', content: responderFAQ(msg) }])
+    }, 400)
   }
 
   return (
@@ -115,17 +159,8 @@ export default function ChatWidget() {
               </div>
             ))}
 
-            {loading && (
-              <div className="flex justify-start">
-                <div className="bg-white border border-gray-100 shadow-sm px-3.5 py-2.5 rounded-2xl rounded-bl-sm flex items-center gap-2">
-                  <Loader2 className="w-3.5 h-3.5 text-gray-400 animate-spin" />
-                  <span className="text-xs text-gray-400">Digitando...</span>
-                </div>
-              </div>
-            )}
-
             {/* Sugestões rápidas — só no início */}
-            {messages.length === 1 && !loading && (
+            {messages.length === 1 && (
               <div className="flex flex-wrap gap-2 pt-1">
                 {MENSAGENS_RAPIDAS.map(q => (
                   <button
@@ -143,7 +178,7 @@ export default function ChatWidget() {
           </div>
 
           {/* Input */}
-          <div className="px-3 py-3 border-t border-gray-100 bg-white flex-shrink-0">
+          <div className="px-3 py-3 border-t border-gray-100 bg-white flex-shrink-0 space-y-2">
             <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-200 px-3 py-2 focus-within:border-orange-400 transition-colors">
               <input
                 ref={inputRef}
@@ -156,12 +191,21 @@ export default function ChatWidget() {
               />
               <button
                 onClick={() => enviar()}
-                disabled={!input.trim() || loading}
+                disabled={!input.trim()}
                 className="w-7 h-7 bg-orange-500 hover:bg-orange-600 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg flex items-center justify-center transition-colors flex-shrink-0"
               >
                 <Send className="w-3.5 h-3.5" />
               </button>
             </div>
+            <a
+              href={`https://wa.me/${WHATSAPP_SUPORTE}?text=${encodeURIComponent('Olá! Preciso de ajuda com o Vrum SOS.')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-1.5 w-full text-xs text-green-700 hover:text-green-800 font-medium py-1 transition-colors"
+            >
+              <MessageCircle className="w-3.5 h-3.5" />
+              Falar com atendente no WhatsApp
+            </a>
           </div>
         </div>
       )}
