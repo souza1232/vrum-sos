@@ -57,14 +57,19 @@ function BuscarContent() {
     }
   }, [])
 
-  async function buscar() {
+  async function buscar(override?: { cidade?: string; tipoServico?: string; coords?: { lat: number; lng: number } | null }) {
     setLoading(true)
     setBuscou(true)
+
+    const cidadeEfetiva = override?.cidade !== undefined ? override.cidade : cidade
+    const tipoEfetivo = override?.tipoServico !== undefined ? override.tipoServico : tipoServico
+    const coordsOverride = override && 'coords' in override ? override.coords : undefined
+
     try {
       // Resolver coordenadas do cliente
-      let coords = clienteCoords
-      if (!coords && cidade.trim()) {
-        coords = await geocodificarCidade(cidade.trim())
+      let coords = coordsOverride !== undefined ? coordsOverride : clienteCoords
+      if (!coords && cidadeEfetiva.trim()) {
+        coords = await geocodificarCidade(cidadeEfetiva.trim())
       }
 
       // Buscar prestadores — sem filtro de cidade se temos coordenadas (filtraremos por raio)
@@ -74,11 +79,11 @@ function BuscarContent() {
         .eq('status_aprovacao', 'aprovado')
         .eq('ativo', true)
 
-      if (tipoServico) query = query.contains('tipos_servico', [tipoServico])
+      if (tipoEfetivo) query = query.contains('tipos_servico', [tipoEfetivo])
 
       // Filtro por texto só quando não há coordenadas
-      if (!coords && cidade.trim()) {
-        query = query.ilike('cidade', `%${cidade.trim()}%`)
+      if (!coords && cidadeEfetiva.trim()) {
+        query = query.ilike('cidade', `%${cidadeEfetiva.trim()}%`)
       }
 
       query = query.order('created_at', { ascending: false })
@@ -98,8 +103,7 @@ function BuscarContent() {
           }))
           .filter((p: any) => {
             if (p.distancia_km === null) {
-              // Prestador sem coordenadas — inclui se a cidade bate no texto
-              return !cidade.trim() || p.cidade.toLowerCase().includes(cidade.trim().toLowerCase())
+              return !cidadeEfetiva.trim() || p.cidade.toLowerCase().includes(cidadeEfetiva.trim().toLowerCase())
             }
             return p.distancia_km <= p.raio_km
           })
@@ -280,15 +284,76 @@ function BuscarContent() {
             <p className="text-gray-500 text-sm">Digite a cidade e/ou tipo de serviço acima.</p>
           </div>
         ) : providers.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Search className="w-8 h-8 text-gray-400" />
+          <div className="py-12 max-w-md mx-auto">
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Search className="w-8 h-8 text-gray-400" />
+              </div>
+              <h2 className="font-bold text-slate-900 text-lg mb-1">Nenhum prestador encontrado</h2>
+              <p className="text-gray-500 text-sm">
+                {cidade && tipoServico
+                  ? `Sem ${TIPOS_SERVICO_LABELS[tipoServico as TipoServico] ?? tipoServico} em ${cidade}.`
+                  : cidade
+                  ? `Sem prestadores em ${cidade}.`
+                  : 'Nenhum resultado para essa busca.'}
+              </p>
             </div>
-            <h2 className="font-bold text-slate-900 text-lg mb-2">Nenhum prestador encontrado</h2>
-            <p className="text-gray-500 text-sm mb-6">Tente outra cidade ou tipo de serviço.</p>
-            <Link href="/provider-register" className="text-sm font-semibold text-orange-500 hover:underline">
-              É prestador? Cadastre-se grátis →
-            </Link>
+
+            {/* Sugestões */}
+            <div className="space-y-3">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide text-center">Tente uma dessas opções</p>
+
+              {tipoServico && (
+                <button
+                  onClick={() => { setTipoServico(''); buscar({ tipoServico: '' }) }}
+                  className="w-full flex items-center gap-3 bg-white border border-gray-200 hover:border-orange-300 hover:bg-orange-50 rounded-xl px-4 py-3.5 transition-colors text-left"
+                >
+                  <div className="w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Search className="w-4 h-4 text-orange-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">Buscar todos os serviços</p>
+                    <p className="text-xs text-gray-500">Remover filtro de {TIPOS_SERVICO_LABELS[tipoServico as TipoServico] ?? tipoServico}</p>
+                  </div>
+                </button>
+              )}
+
+              {cidade && (
+                <button
+                  onClick={() => { setCidade(''); setClienteCoords(null); buscar({ cidade: '', coords: null }) }}
+                  className="w-full flex items-center gap-3 bg-white border border-gray-200 hover:border-orange-300 hover:bg-orange-50 rounded-xl px-4 py-3.5 transition-colors text-left"
+                >
+                  <div className="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">Buscar em qualquer cidade</p>
+                    <p className="text-xs text-gray-500">Ver todos os prestadores disponíveis no Brasil</p>
+                  </div>
+                </button>
+              )}
+
+              {tipoServico && cidade && (
+                <button
+                  onClick={() => { setTipoServico(''); setCidade(''); setClienteCoords(null); buscar({ tipoServico: '', cidade: '', coords: null }) }}
+                  className="w-full flex items-center gap-3 bg-white border border-gray-200 hover:border-orange-300 hover:bg-orange-50 rounded-xl px-4 py-3.5 transition-colors text-left"
+                >
+                  <div className="w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <X className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">Limpar todos os filtros</p>
+                    <p className="text-xs text-gray-500">Ver todos os prestadores cadastrados</p>
+                  </div>
+                </button>
+              )}
+
+              <div className="pt-2 border-t border-gray-100 text-center">
+                <Link href="/provider-register" className="text-sm font-semibold text-orange-500 hover:text-orange-600">
+                  É prestador? Cadastre-se grátis e apareça aqui →
+                </Link>
+              </div>
+            </div>
           </div>
         ) : (
           <>
