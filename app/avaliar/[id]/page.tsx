@@ -4,7 +4,10 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
-import { Zap, Star, CheckCircle, MapPin } from 'lucide-react'
+import { Zap, Star, CheckCircle, MapPin, Clock } from 'lucide-react'
+
+const COOLDOWN_DIAS = 30
+const storageKey = (id: string) => `vrum_reviewed_${id}`
 
 export default function AvaliarPage({ params }: { params: { id: string } }) {
   const supabase = createClient()
@@ -17,8 +20,14 @@ export default function AvaliarPage({ params }: { params: { id: string } }) {
   const [loading, setLoading] = useState(false)
   const [enviado, setEnviado] = useState(false)
   const [erro, setErro] = useState('')
+  const [jaAvaliou, setJaAvaliou] = useState(false)
 
   useEffect(() => {
+    const ts = localStorage.getItem(storageKey(params.id))
+    if (ts) {
+      const diasPassados = (Date.now() - parseInt(ts)) / (1000 * 60 * 60 * 24)
+      if (diasPassados < COOLDOWN_DIAS) setJaAvaliou(true)
+    }
     supabase
       .from('providers')
       .select('id, nome, nome_empresa, cidade, estado, foto_url, tipos_servico')
@@ -47,6 +56,7 @@ export default function AvaliarPage({ params }: { params: { id: string } }) {
     if (error) {
       setErro('Erro ao enviar. Tente novamente.')
     } else {
+      localStorage.setItem(storageKey(params.id), Date.now().toString())
       setEnviado(true)
     }
   }
@@ -75,7 +85,25 @@ export default function AvaliarPage({ params }: { params: { id: string } }) {
 
       <div className="flex-1 max-w-md mx-auto w-full px-4 py-10">
 
-        {enviado ? (
+        {jaAvaliou && !enviado ? (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
+            <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Clock className="w-8 h-8 text-amber-500" />
+            </div>
+            <h2 className="text-xl font-black text-slate-900 mb-2">Você já avaliou este prestador</h2>
+            <p className="text-gray-500 text-sm mb-6">
+              É possível avaliar novamente após {COOLDOWN_DIAS} dias. Isso garante avaliações mais confiáveis para todos.
+            </p>
+            <div className="flex gap-3">
+              <Link href="/buscar" className="flex-1 text-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl text-sm transition-colors">
+                Buscar prestadores
+              </Link>
+              <Link href={`/p/${params.id}`} className="flex-1 text-center border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold py-3 rounded-xl text-sm transition-colors">
+                Ver perfil
+              </Link>
+            </div>
+          </div>
+        ) : enviado ? (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-8 h-8 text-green-500" />
