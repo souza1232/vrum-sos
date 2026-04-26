@@ -49,6 +49,7 @@ function BuscarContent() {
   const [geoLoading, setGeoLoading] = useState(false)
   const [geoErro, setGeoErro] = useState('')
   const [clienteCoords, setClienteCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [wppToast, setWppToast] = useState<{ id: string; nome: string; link: string } | null>(null)
 
   useEffect(() => {
     if (searchParams.get('cidade') || searchParams.get('tipo')) {
@@ -353,15 +354,16 @@ function BuscarContent() {
                         {/* Botões */}
                         <div className="px-5 pb-3 flex gap-2">
                           {wLink && (
-                            <a
-                              href={wLink}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                            <button
+                              onClick={() => {
+                                window.open(wLink, '_blank')
+                                setWppToast({ id: p.id, nome: p.nome_empresa || p.nome, link: wLink })
+                              }}
                               className="flex-1 flex items-center justify-center gap-1.5 bg-green-500 hover:bg-green-600 text-white font-semibold text-xs py-2.5 rounded-xl transition-colors"
                             >
                               <MessageCircle className="w-3.5 h-3.5" />
                               WhatsApp
-                            </a>
+                            </button>
                           )}
                           {p.telefone && (
                             <a
@@ -399,6 +401,32 @@ function BuscarContent() {
           </div>
 
       <Footer />
+
+      {/* TOAST — lembrete de avaliar após WhatsApp */}
+      {wppToast && (
+        <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-96 z-50 bg-slate-900 rounded-2xl shadow-2xl p-4 flex items-start gap-3 animate-fade-in">
+          <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center flex-shrink-0">
+            <MessageCircle className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-white text-sm font-semibold">WhatsApp aberto com {wppToast.nome}</p>
+            <p className="text-gray-400 text-xs mt-0.5">Após o atendimento, avalie e ajude outros motoristas!</p>
+            <Link
+              href={`/avaliar/${wppToast.id}`}
+              className="inline-flex items-center gap-1 mt-2 text-orange-400 hover:text-orange-300 text-xs font-semibold"
+            >
+              <Star className="w-3 h-3" />
+              Avaliar prestador →
+            </Link>
+          </div>
+          <button
+            onClick={() => setWppToast(null)}
+            className="text-gray-500 hover:text-gray-300 flex-shrink-0 text-lg leading-none"
+          >
+            ×
+          </button>
+        </div>
+      )}
     </div>
   )
 }
