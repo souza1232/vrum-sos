@@ -15,7 +15,7 @@ import { geocodeCity } from '@/lib/geocoding'
 import {
   Wrench, Clock, MapPin, Phone, MessageCircle,
   AlertCircle, CheckCircle, Edit3, Save, X, FileText, TrendingUp, Camera,
-  LocateFixed, Loader2, Navigation, Star
+  LocateFixed, Loader2, Navigation, Star, Eye
 } from 'lucide-react'
 
 export default function PainelPage() {
@@ -26,6 +26,7 @@ export default function PainelPage() {
   const [editMode, setEditMode] = useState(false)
   const [saving, setSaving] = useState(false)
   const [requestStats, setRequestStats] = useState({ total: 0, pendente: 0, concluido: 0 })
+  const [viewStats, setViewStats] = useState({ semana: 0, mes: 0 })
   const [locLoading, setLocLoading] = useState(false)
   const { showToast, ToastComponent } = useToast()
 
@@ -60,6 +61,18 @@ export default function PainelPage() {
             concluido: reqs.filter(r => r.status === 'concluido').length,
           })
         }
+
+        const agora = new Date()
+        const ha7dias = new Date(agora.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
+        const ha30dias = new Date(agora.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString()
+
+        const [{ count: semana }, { count: mes }] = await Promise.all([
+          supabase.from('profile_views').select('*', { count: 'exact', head: true })
+            .eq('provider_id', providerData.id).gte('viewed_at', ha7dias),
+          supabase.from('profile_views').select('*', { count: 'exact', head: true })
+            .eq('provider_id', providerData.id).gte('viewed_at', ha30dias),
+        ])
+        setViewStats({ semana: semana ?? 0, mes: mes ?? 0 })
       }
       setLoading(false)
     }
@@ -350,6 +363,31 @@ export default function PainelPage() {
                   </button>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* Visibilidade do perfil */}
+          {provider.status_aprovacao === 'aprovado' && (
+            <div className="bg-white border border-gray-200 rounded-2xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <Eye className="w-4 h-4 text-orange-500" />
+                <h2 className="font-semibold text-slate-900 text-sm">Visibilidade do perfil</h2>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <p className="text-3xl font-black text-slate-900">{viewStats.semana}</p>
+                  <p className="text-xs text-gray-500 mt-1">visualizações nos últimos 7 dias</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-3xl font-black text-slate-900">{viewStats.mes}</p>
+                  <p className="text-xs text-gray-500 mt-1">visualizações nos últimos 30 dias</p>
+                </div>
+              </div>
+              {viewStats.semana === 0 && (
+                <p className="text-xs text-gray-400 text-center mt-3 border-t border-gray-100 pt-3">
+                  Complete seu perfil para aparecer mais nas buscas e receber mais visitas.
+                </p>
+              )}
             </div>
           )}
 

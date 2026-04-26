@@ -10,6 +10,7 @@ import {
   Shield, ArrowLeft, Share2, CheckCircle,
 } from 'lucide-react'
 import { whatsappLink } from '@/lib/utils'
+import ViewTracker from '@/components/ui/ViewTracker'
 
 const APP_URL = 'https://vrumsos.com.br'
 
@@ -137,6 +138,7 @@ export default async function PerfilPrestadorPage({ params }: { params: { id: st
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <ViewTracker providerId={params.id} />
       {/* NAVBAR */}
       <nav className="bg-slate-900 border-b border-slate-800 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
