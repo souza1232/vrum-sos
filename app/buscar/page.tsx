@@ -16,6 +16,27 @@ import { whatsappLink, formatPhone } from '@/lib/utils'
 
 const TIPOS = Object.entries(TIPOS_SERVICO_LABELS) as [TipoServico, string][]
 
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371
+  const dLat = (lat2 - lat1) * Math.PI / 180
+  const dLng = (lng2 - lng1) * Math.PI / 180
+  const a = Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+}
+
+async function geocodificarCidade(cidade: string): Promise<{ lat: number; lng: number } | null> {
+  try {
+    const q = encodeURIComponent(`${cidade}, Brazil`)
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${q}&format=json&limit=1`)
+    const data = await res.json()
+    if (!data?.length) return null
+    return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) }
+  } catch {
+    return null
+  }
+}
+
 function BuscarContent() {
   const searchParams = useSearchParams()
   const supabase = createClient()
@@ -27,6 +48,7 @@ function BuscarContent() {
   const [buscou, setBuscou] = useState(false)
   const [geoLoading, setGeoLoading] = useState(false)
   const [geoErro, setGeoErro] = useState('')
+  const [clienteCoords, setClienteCoords] = useState<{ lat: number; lng: number } | null>(null)
 
   useEffect(() => {
     if (searchParams.get('cidade') || searchParams.get('tipo')) {
@@ -38,22 +60,56 @@ function BuscarContent() {
     setLoading(true)
     setBuscou(true)
     try {
+      // Resolver coordenadas do cliente
+      let coords = clienteCoords
+      if (!coords && cidade.trim()) {
+        coords = await geocodificarCidade(cidade.trim())
+      }
+
+      // Buscar prestadores — sem filtro de cidade se temos coordenadas (filtraremos por raio)
       let query = supabase
         .from('providers')
         .select('*')
         .eq('status_aprovacao', 'aprovado')
         .eq('ativo', true)
-        .order('created_at', { ascending: false })
 
-      if (cidade.trim()) query = query.ilike('cidade', `%${cidade.trim()}%`)
       if (tipoServico) query = query.contains('tipos_servico', [tipoServico])
+
+      // Filtro por texto só quando não há coordenadas
+      if (!coords && cidade.trim()) {
+        query = query.ilike('cidade', `%${cidade.trim()}%`)
+      }
+
+      query = query.order('created_at', { ascending: false })
 
       const { data } = await query
       if (!data) return
 
-      const ids = data.map((p: any) => p.id)
-      const { data: reviews } = await supabase
-        .from('reviews').select('provider_id, rating').in('provider_id', ids)
+      // Calcular distância e filtrar por raio quando temos coordenadas
+      let resultado = data as any[]
+      if (coords) {
+        resultado = data
+          .map((p: any) => ({
+            ...p,
+            distancia_km: p.latitude && p.longitude
+              ? Math.round(haversineKm(coords!.lat, coords!.lng, p.latitude, p.longitude))
+              : null,
+          }))
+          .filter((p: any) => {
+            if (p.distancia_km === null) {
+              // Prestador sem coordenadas — inclui se a cidade bate no texto
+              return !cidade.trim() || p.cidade.toLowerCase().includes(cidade.trim().toLowerCase())
+            }
+            return p.distancia_km <= p.raio_km
+          })
+          .sort((a: any, b: any) => (a.distancia_km ?? 9999) - (b.distancia_km ?? 9999))
+      }
+
+      // Ratings
+      const ids = resultado.map((p: any) => p.id)
+      const { data: reviews } = ids.length
+        ? await supabase.from('reviews').select('provider_id, rating').in('provider_id', ids)
+        : { data: [] }
 
       const ratingsMap: Record<string, { sum: number; count: number }> = {}
       reviews?.forEach((r: any) => {
@@ -62,7 +118,7 @@ function BuscarContent() {
         ratingsMap[r.provider_id].count += 1
       })
 
-      setProviders(data.map((p: any) => ({
+      setProviders(resultado.map((p: any) => ({
         ...p,
         avg_rating: ratingsMap[p.id] ? ratingsMap[p.id].sum / ratingsMap[p.id].count : null,
         total_reviews: ratingsMap[p.id]?.count ?? 0,
@@ -83,6 +139,7 @@ function BuscarContent() {
       async (pos) => {
         try {
           const { latitude, longitude } = pos.coords
+          setClienteCoords({ lat: latitude, lng: longitude })
           const res = await fetch(
             `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=pt-BR`,
             { headers: { 'User-Agent': 'VrumSOS/1.0' } }
@@ -287,7 +344,10 @@ function BuscarContent() {
                         {/* Info */}
                         <div className="px-5 py-3 flex items-center gap-3 text-xs text-gray-500">
                           {p.atende_24h && <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-green-500" />24h</span>}
-                          <span><MapPin className="w-3 h-3 inline mr-0.5" />Raio {p.raio_km}km</span>
+                          {p.distancia_km != null
+                            ? <span className="flex items-center gap-1 text-orange-500 font-semibold"><MapPin className="w-3 h-3" />{p.distancia_km}km de você</span>
+                            : <span><MapPin className="w-3 h-3 inline mr-0.5" />Raio {p.raio_km}km</span>
+                          }
                         </div>
 
                         {/* Botões */}
