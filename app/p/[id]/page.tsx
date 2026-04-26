@@ -36,7 +36,19 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     description: p.descricao || `${nome} oferece ${servicos} em ${p.cidade}, ${p.estado}. Contato direto pelo WhatsApp.`,
     openGraph: {
       title: `${nome} | Vrum SOS`,
-      description: `${servicos} em ${p.cidade}, ${p.estado}`,
+      description: `${servicos} em ${p.cidade}, ${p.estado}. Prestador verificado — contato direto pelo WhatsApp.`,
+      images: [
+        {
+          url: `https://vrumsos.com.br/api/og?id=${params.id}`,
+          width: 1200,
+          height: 630,
+          alt: `${nome} — ${servicos} em ${p.cidade}`,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      images: [`https://vrumsos.com.br/api/og?id=${params.id}`],
     },
   }
 }
