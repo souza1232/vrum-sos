@@ -418,9 +418,14 @@ export default function ProviderRegisterPage() {
           <hr className="border-gray-100" />
           <fieldset className="space-y-4">
             <legend className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
-              Fotos das ferramentas ou local de trabalho
+              Sua foto ou local de trabalho
             </legend>
-            <p className="text-xs text-gray-400">Até 3 fotos. Ajuda a transmitir mais confiança para os clientes.</p>
+            <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 flex items-start gap-2">
+              <Camera className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-orange-700">
+                <strong>Prestadores com foto recebem até 3x mais contatos.</strong> Adicione uma foto sua ou do seu local de trabalho — isso passa muito mais confiança para quem está procurando ajuda.
+              </p>
+            </div>
 
             <div className="flex flex-wrap gap-3">
               {fotosPreviews.map((src, i) => (

@@ -195,6 +195,28 @@ export default function PainelPage() {
             </div>
           </div>
 
+          {/* Banner sem foto */}
+          {!provider.foto_url && !editMode && (
+            <div className="bg-orange-50 border border-orange-200 rounded-2xl p-5 flex items-start gap-4">
+              <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Camera className="w-5 h-5 text-orange-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-orange-900">Seu perfil está sem foto!</h3>
+                <p className="text-sm text-orange-700 mt-0.5">
+                  Prestadores com foto recebem até <strong>3x mais contatos</strong>. Clientes confiam mais em quem mostra o rosto.
+                </p>
+                <button
+                  onClick={() => setEditMode(true)}
+                  className="mt-3 inline-flex items-center gap-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
+                >
+                  <Camera className="w-3.5 h-3.5" />
+                  Adicionar foto agora
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Mini stats */}
           {provider.status_aprovacao === 'aprovado' && (
             <div className="grid grid-cols-3 gap-2 sm:gap-4">
