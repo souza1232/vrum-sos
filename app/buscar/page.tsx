@@ -10,7 +10,7 @@ import Footer from '@/components/layout/Footer'
 import LooviCarousel from '@/components/ui/LooviCarousel'
 import {
   Zap, Search, MapPin, Phone, MessageCircle, Star,
-  Building2, User, Clock, Filter, X
+  Building2, User, Clock, Filter, X, LocateFixed, Loader2
 } from 'lucide-react'
 import { whatsappLink, formatPhone } from '@/lib/utils'
 
@@ -25,6 +25,8 @@ function BuscarContent() {
   const [providers, setProviders] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [buscou, setBuscou] = useState(false)
+  const [geoLoading, setGeoLoading] = useState(false)
+  const [geoErro, setGeoErro] = useState('')
 
   useEffect(() => {
     if (searchParams.get('cidade') || searchParams.get('tipo')) {
@@ -70,6 +72,48 @@ function BuscarContent() {
     }
   }
 
+  async function detectarLocalizacao() {
+    if (!navigator.geolocation) {
+      setGeoErro('Seu navegador não suporta geolocalização')
+      return
+    }
+    setGeoLoading(true)
+    setGeoErro('')
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const { latitude, longitude } = pos.coords
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=pt-BR`,
+            { headers: { 'User-Agent': 'VrumSOS/1.0' } }
+          )
+          const data = await res.json()
+          const nomeCidade =
+            data.address?.city ||
+            data.address?.town ||
+            data.address?.municipality ||
+            data.address?.county ||
+            ''
+          if (nomeCidade) {
+            setCidade(nomeCidade)
+            setGeoErro('')
+          } else {
+            setGeoErro('Não foi possível identificar sua cidade')
+          }
+        } catch {
+          setGeoErro('Erro ao obter localização')
+        } finally {
+          setGeoLoading(false)
+        }
+      },
+      () => {
+        setGeoErro('Permissão negada. Digite sua cidade manualmente.')
+        setGeoLoading(false)
+      },
+      { timeout: 10000 }
+    )
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     buscar()
@@ -106,12 +150,28 @@ function BuscarContent() {
               <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
               <input
                 type="text"
-                placeholder="Cidade (ex: Teixeira de Freitas)"
+                placeholder="Cidade (ex: Londrina)"
                 value={cidade}
                 onChange={e => setCidade(e.target.value)}
                 className="flex-1 text-sm text-gray-700 outline-none placeholder-gray-400"
               />
-              {cidade && <button type="button" onClick={() => setCidade('')}><X className="w-3.5 h-3.5 text-gray-400" /></button>}
+              {cidade
+                ? <button type="button" onClick={() => setCidade('')}><X className="w-3.5 h-3.5 text-gray-400" /></button>
+                : (
+                  <button
+                    type="button"
+                    onClick={detectarLocalizacao}
+                    disabled={geoLoading}
+                    title="Usar minha localização"
+                    className="text-orange-500 hover:text-orange-600 flex-shrink-0"
+                  >
+                    {geoLoading
+                      ? <Loader2 className="w-4 h-4 animate-spin" />
+                      : <LocateFixed className="w-4 h-4" />
+                    }
+                  </button>
+                )
+              }
             </div>
             <div className="flex-1 flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2.5">
               <Filter className="w-4 h-4 text-gray-400 flex-shrink-0" />
@@ -134,6 +194,9 @@ function BuscarContent() {
               Buscar
             </button>
           </form>
+          {geoErro && (
+            <p className="text-center text-xs text-red-400 mt-3">{geoErro}</p>
+          )}
         </div>
       </div>
 
