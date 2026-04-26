@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Wrench, Truck, Circle, Key, Zap, ArrowRight, MapPin, Clock, Shield } from 'lucide-react'
+import { Wrench, Truck, Circle, Key, Zap, ArrowRight, MapPin, Clock, Shield, ChevronDown } from 'lucide-react'
 import Footer from '@/components/layout/Footer'
 
 const CIDADES: Record<string, string> = {
@@ -16,12 +16,12 @@ const CIDADES: Record<string, string> = {
 }
 
 const SERVICOS = [
-  { slug: 'mecanico', label: 'Mecânico', icon: Wrench, cor: 'bg-blue-500', descricao: 'Reparos mecânicos, manutenção preventiva e corretiva' },
-  { slug: 'eletricista', label: 'Eletricista Automotivo', icon: Zap, cor: 'bg-yellow-500', descricao: 'Problemas elétricos, bateria, alternador e muito mais' },
-  { slug: 'chaveiro', label: 'Chaveiro', icon: Key, cor: 'bg-purple-500', descricao: 'Abertura de veículos, cópias de chave e transponder' },
-  { slug: 'borracheiro', label: 'Borracheiro', icon: Circle, cor: 'bg-green-500', descricao: 'Troca de pneus, remendo e balanceamento' },
-  { slug: 'guincho', label: 'Guincho', icon: Truck, cor: 'bg-red-500', descricao: 'Reboque e transporte de veículos 24h' },
-  { slug: 'guincho-pesado', label: 'Guincho Pesado', icon: Truck, cor: 'bg-orange-500', descricao: 'Reboque de caminhões, ônibus e máquinas pesadas' },
+  { slug: 'mecanico', label: 'Mecânico', icon: Wrench, cor: 'bg-blue-500', descricao: 'Reparos mecânicos, manutenção preventiva e corretiva para carros, motos e caminhões.' },
+  { slug: 'eletricista', label: 'Eletricista Automotivo', icon: Zap, cor: 'bg-yellow-500', descricao: 'Diagnóstico e reparo de problemas elétricos, bateria fraca, alternador e injeção eletrônica.' },
+  { slug: 'chaveiro', label: 'Chaveiro', icon: Key, cor: 'bg-purple-500', descricao: 'Abertura de veículos trancados, cópia de chaves e programação de transponder.' },
+  { slug: 'borracheiro', label: 'Borracheiro', icon: Circle, cor: 'bg-green-500', descricao: 'Troca de pneus furados, remendo, calibragem e balanceamento na hora.' },
+  { slug: 'guincho', label: 'Guincho', icon: Truck, cor: 'bg-red-500', descricao: 'Reboque de veículos 24h para qualquer destino, com segurança e rapidez.' },
+  { slug: 'guincho_pesado', label: 'Guincho Pesado', icon: Truck, cor: 'bg-orange-500', descricao: 'Reboque especializado para caminhões, ônibus, tratores e máquinas pesadas.' },
 ]
 
 export async function generateStaticParams() {
@@ -33,8 +33,8 @@ export async function generateMetadata({ params }: { params: { cidade: string } 
   if (!nomeCidade) return {}
 
   return {
-    title: `Assistência Automotiva em ${nomeCidade} — Mecânico, Guincho e mais | Vrum SOS`,
-    description: `Encontre mecânicos, guinchos, borracheiros, chaveiros e eletricistas automotivos em ${nomeCidade} e região. Atendimento 24h, rápido e confiável. Cadastre-se grátis!`,
+    title: `Mecânico, Guincho e Chaveiro em ${nomeCidade} — Assistência 24h | Vrum SOS`,
+    description: `Precisa de mecânico, guincho, borracheiro ou chaveiro em ${nomeCidade}? Encontre prestadores verificados, veja o WhatsApp e ligue direto. Sem cadastro, atendimento 24h.`,
     keywords: [
       `mecânico ${nomeCidade}`,
       `guincho ${nomeCidade}`,
@@ -44,12 +44,14 @@ export async function generateMetadata({ params }: { params: { cidade: string } 
       `assistência automotiva ${nomeCidade}`,
       `socorro automotivo ${nomeCidade}`,
       `guincho 24h ${nomeCidade}`,
-      `mecânico perto ${nomeCidade}`,
-      `prestador automotivo ${nomeCidade}`,
+      `mecânico perto de mim ${nomeCidade}`,
+      `carro quebrado ${nomeCidade}`,
+      `socorro veicular ${nomeCidade}`,
+      `guincho barato ${nomeCidade}`,
     ],
     openGraph: {
-      title: `Assistência Automotiva em ${nomeCidade} | Vrum SOS`,
-      description: `Mecânicos, guinchos, borracheiros e chaveiros em ${nomeCidade}. Atendimento 24h!`,
+      title: `Mecânico, Guincho e Chaveiro em ${nomeCidade} | Vrum SOS`,
+      description: `Prestadores verificados em ${nomeCidade}. Contato direto pelo WhatsApp, atendimento 24h. Sem cadastro!`,
     },
   }
 }
@@ -58,8 +60,46 @@ export default function CidadePage({ params }: { params: { cidade: string } }) {
   const nomeCidade = CIDADES[params.cidade]
   if (!nomeCidade) notFound()
 
+  const faqs = [
+    {
+      q: `Como encontrar um mecânico em ${nomeCidade}?`,
+      a: `No Vrum SOS você busca mecânicos em ${nomeCidade} sem precisar criar conta. Basta acessar a busca, digitar ${nomeCidade} ou usar seu GPS, e ver os prestadores disponíveis com WhatsApp e telefone para contato direto.`,
+    },
+    {
+      q: `Tem guincho 24 horas em ${nomeCidade}?`,
+      a: `Sim. Vários prestadores cadastrados em ${nomeCidade} e região atendem 24h, incluindo fins de semana e feriados. Você pode filtrar por "Guincho" na busca e ver quais estão disponíveis agora.`,
+    },
+    {
+      q: `Como funciona o Vrum SOS em ${nomeCidade}?`,
+      a: `O Vrum SOS conecta motoristas com prestadores automotivos verificados em ${nomeCidade}. Você busca pelo serviço que precisa, vê o perfil do prestador com avaliações de outros clientes, e entra em contato direto pelo WhatsApp ou telefone — sem intermediário.`,
+    },
+    {
+      q: `O atendimento é pago?`,
+      a: `A plataforma Vrum SOS é gratuita para quem busca prestadores. O valor do serviço automotivo é combinado diretamente com o prestador em ${nomeCidade}.`,
+    },
+    {
+      q: `Como me cadastrar como prestador em ${nomeCidade}?`,
+      a: `O cadastro é gratuito. Acesse "Quero ser prestador", preencha seus dados e serviços oferecidos em ${nomeCidade}, e aguarde a aprovação. Após aprovado, seu perfil aparece nas buscas dos motoristas da região.`,
+    },
+  ]
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map(f => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       {/* NAVBAR */}
       <nav className="bg-slate-900 border-b border-slate-800 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -84,19 +124,25 @@ export default function CidadePage({ params }: { params: { cidade: string } }) {
             {nomeCidade} e região
           </div>
           <h1 className="text-4xl sm:text-5xl font-black text-white mb-6">
-            Assistência Automotiva em{' '}
+            Mecânico, Guincho e Chaveiro em{' '}
             <span className="text-orange-400">{nomeCidade}</span>
           </h1>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-10">
-            Encontre mecânicos, guinchos, borracheiros, chaveiros e eletricistas em {nomeCidade}.
-            Prestadores verificados, atendimento 24h e contato direto pelo WhatsApp.
+            Carro quebrado em {nomeCidade}? Encontre mecânicos, guinchos, borracheiros e chaveiros
+            verificados perto de você. Veja o WhatsApp e ligue direto — sem cadastro.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/register" className="inline-flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-4 rounded-xl transition-colors">
-              Preciso de ajuda agora
+            <Link
+              href={`/buscar?cidade=${encodeURIComponent(nomeCidade)}`}
+              className="inline-flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-4 rounded-xl transition-colors"
+            >
+              Ver prestadores em {nomeCidade}
               <ArrowRight className="w-5 h-5" />
             </Link>
-            <Link href="/provider-register" className="inline-flex items-center justify-center gap-2 border-2 border-orange-500/40 hover:border-orange-500 text-orange-400 font-semibold px-8 py-4 rounded-xl transition-colors">
+            <Link
+              href="/provider-register"
+              className="inline-flex items-center justify-center gap-2 border-2 border-orange-500/40 hover:border-orange-500 text-orange-400 font-semibold px-8 py-4 rounded-xl transition-colors"
+            >
               Sou prestador em {nomeCidade}
             </Link>
           </div>
@@ -110,20 +156,24 @@ export default function CidadePage({ params }: { params: { cidade: string } }) {
             Serviços disponíveis em {nomeCidade}
           </h2>
           <p className="text-gray-500 text-center mb-12 max-w-xl mx-auto">
-            Conectamos você ao profissional certo, na hora certa.
+            Clique no serviço que você precisa e veja os prestadores disponíveis agora — sem cadastro.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {SERVICOS.map(s => (
-              <div key={s.slug} className="bg-white border border-gray-200 rounded-2xl p-6 hover:border-orange-200 hover:shadow-md transition-all">
-                <div className={`w-12 h-12 ${s.cor} rounded-xl flex items-center justify-center mb-4`}>
+              <Link
+                key={s.slug}
+                href={`/buscar?tipo=${s.slug}&cidade=${encodeURIComponent(nomeCidade)}`}
+                className="group bg-white border border-gray-200 rounded-2xl p-6 hover:border-orange-300 hover:shadow-md transition-all"
+              >
+                <div className={`w-12 h-12 ${s.cor} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                   <s.icon className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="font-bold text-slate-900 mb-2">{s.label} em {nomeCidade}</h3>
                 <p className="text-sm text-gray-500 mb-4">{s.descricao}</p>
-                <Link href="/register" className="text-sm font-semibold text-orange-500 hover:text-orange-600 flex items-center gap-1">
-                  Encontrar profissional <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
+                <span className="text-sm font-semibold text-orange-500 group-hover:text-orange-600 flex items-center gap-1">
+                  Ver prestadores <ArrowRight className="w-4 h-4" />
+                </span>
+              </Link>
             ))}
           </div>
         </div>
@@ -134,9 +184,9 @@ export default function CidadePage({ params }: { params: { cidade: string } }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             {[
-              { icon: Clock, titulo: 'Atendimento 24h', descricao: `Prestadores disponíveis a qualquer hora em ${nomeCidade}` },
-              { icon: Shield, titulo: 'Prestadores verificados', descricao: 'Todos passam por análise antes de entrar na plataforma' },
-              { icon: MapPin, titulo: `Perto de você`, descricao: `Profissionais que atendem em ${nomeCidade} e região` },
+              { icon: Clock, titulo: 'Atendimento 24h', descricao: `Prestadores em ${nomeCidade} disponíveis a qualquer hora, incluindo fins de semana e feriados.` },
+              { icon: Shield, titulo: 'Prestadores verificados', descricao: `Todos os profissionais em ${nomeCidade} passam por análise antes de aparecer na plataforma.` },
+              { icon: MapPin, titulo: 'Contato direto', descricao: `Fale pelo WhatsApp ou ligue direto para o prestador em ${nomeCidade}. Sem intermediário.` },
             ].map((d, i) => (
               <div key={i} className="bg-white rounded-2xl p-8 border border-gray-100">
                 <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-4">
@@ -150,16 +200,44 @@ export default function CidadePage({ params }: { params: { cidade: string } }) {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* FAQ */}
+      <section className="py-16 sm:py-24 bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-slate-900 text-center mb-4">
+            Perguntas frequentes
+          </h2>
+          <p className="text-gray-500 text-center mb-12">
+            Dúvidas sobre assistência automotiva em {nomeCidade}? Respondemos as principais.
+          </p>
+          <div className="space-y-4">
+            {faqs.map((faq, i) => (
+              <details key={i} className="group bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden">
+                <summary className="flex items-center justify-between px-6 py-4 cursor-pointer font-semibold text-slate-900 text-sm sm:text-base list-none">
+                  {faq.q}
+                  <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0 ml-3 group-open:rotate-180 transition-transform" />
+                </summary>
+                <div className="px-6 pb-5">
+                  <p className="text-gray-600 text-sm leading-relaxed">{faq.a}</p>
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA PRESTADOR */}
       <section className="py-16 bg-orange-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-black text-white mb-4">
             É prestador em {nomeCidade}?
           </h2>
           <p className="text-orange-100 mb-8 max-w-xl mx-auto">
-            Cadastre-se gratuitamente e comece a receber chamados de clientes em {nomeCidade} e região.
+            Cadastre-se gratuitamente e comece a receber chamados de clientes em {nomeCidade} e região. Sem mensalidade para começar.
           </p>
-          <Link href="/provider-register" className="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-orange-600 font-bold px-8 py-4 rounded-xl transition-colors">
+          <Link
+            href="/provider-register"
+            className="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-orange-600 font-bold px-8 py-4 rounded-xl transition-colors"
+          >
             Quero ser prestador em {nomeCidade}
             <ArrowRight className="w-5 h-5" />
           </Link>
