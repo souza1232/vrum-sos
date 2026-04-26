@@ -291,7 +291,7 @@ function BuscarContent() {
                         </div>
 
                         {/* Botões */}
-                        <div className="px-5 pb-5 flex gap-2">
+                        <div className="px-5 pb-3 flex gap-2">
                           {wLink && (
                             <a
                               href={wLink}
@@ -312,6 +312,14 @@ function BuscarContent() {
                               Ligar
                             </a>
                           )}
+                        </div>
+                        <div className="px-5 pb-5">
+                          <Link
+                            href={`/p/${p.id}`}
+                            className="w-full flex items-center justify-center text-xs text-gray-500 hover:text-orange-500 transition-colors py-1.5"
+                          >
+                            Ver perfil completo →
+                          </Link>
                         </div>
                       </div>
                     )
