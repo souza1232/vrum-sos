@@ -55,7 +55,7 @@ export default async function PerfilPrestadorPage({ params }: { params: { id: st
 
   const { data: reviews } = await supabase
     .from('reviews')
-    .select('rating, comentario, created_at')
+    .select('rating, comentario, avaliador_nome, created_at')
     .eq('provider_id', params.id)
     .order('created_at', { ascending: false })
 
@@ -77,8 +77,66 @@ export default async function PerfilPrestadorPage({ params }: { params: { id: st
     provider.atendimento_emergencial && 'Emergência',
   ].filter(Boolean) as string[]
 
+  const servicos = (provider.tipos_servico as TipoServico[])
+    ?.map((t: TipoServico) => TIPOS_SERVICO_LABELS[t])
+    .join(', ') ?? ''
+
+  const jsonLd: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'AutomotiveBusiness',
+    name: provider.nome_empresa || provider.nome,
+    description: provider.descricao || `${servicos} em ${provider.cidade}, ${provider.estado}`,
+    url: `${APP_URL}/p/${params.id}`,
+    ...(provider.foto_url ? { image: provider.foto_url } : {}),
+    ...(provider.telefone ? { telephone: provider.telefone } : {}),
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: provider.cidade,
+      addressRegion: provider.estado,
+      addressCountry: 'BR',
+    },
+    ...(provider.latitude && provider.longitude ? {
+      geo: {
+        '@type': 'GeoCoordinates',
+        latitude: provider.latitude,
+        longitude: provider.longitude,
+      },
+    } : {}),
+    ...(provider.atende_24h ? { openingHours: 'Mo-Su 00:00-24:00' } : {}),
+    ...(avgRating && reviews?.length ? {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: avgRating.toFixed(1),
+        reviewCount: reviews.length,
+        bestRating: 5,
+        worstRating: 1,
+      },
+    } : {}),
+    ...(reviews && reviews.length > 0 ? {
+      review: reviews.slice(0, 5).map((r: any) => ({
+        '@type': 'Review',
+        reviewRating: {
+          '@type': 'Rating',
+          ratingValue: r.rating,
+          bestRating: 5,
+          worstRating: 1,
+        },
+        author: {
+          '@type': 'Person',
+          name: r.avaliador_nome || 'Cliente anônimo',
+        },
+        datePublished: new Date(r.created_at).toISOString().split('T')[0],
+        ...(r.comentario ? { reviewBody: r.comentario } : {}),
+      })),
+    } : {}),
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* NAVBAR */}
       <nav className="bg-slate-900 border-b border-slate-800 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
