@@ -54,6 +54,7 @@ export const metadata: Metadata = {
     siteName: 'Vrum SOS',
     title: 'Vrum SOS — Assistência Automotiva na sua região',
     description: 'Encontre mecânicos, guincheiros, borracheiros e chaveiros perto de você. Disponível 24h.',
+    images: [{ url: `${APP_URL}/api/og`, width: 1200, height: 630, alt: 'Vrum SOS' }],
   },
   twitter: {
     card: 'summary_large_image',
