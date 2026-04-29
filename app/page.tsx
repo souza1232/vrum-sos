@@ -114,13 +114,21 @@ export default function HomePage() {
                 perto de você, agora mesmo. Rápido, confiável e verificado.
               </p>
 
-              <Link
-                href="/buscar"
-                className="inline-flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-black px-8 py-4 rounded-xl text-lg transition-all hover:shadow-lg hover:shadow-orange-500/30 active:scale-95 w-full sm:w-auto mb-4"
-              >
-                Buscar prestador agora
-                <ArrowRight className="w-5 h-5" />
-              </Link>
+              <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                <Link
+                  href="/socorro"
+                  className="inline-flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white font-black px-8 py-4 rounded-xl text-lg transition-all hover:shadow-lg hover:shadow-red-500/30 active:scale-95"
+                >
+                  🚨 Pedir socorro agora
+                </Link>
+                <Link
+                  href="/buscar"
+                  className="inline-flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-black px-8 py-4 rounded-xl text-lg transition-all hover:shadow-lg hover:shadow-orange-500/30 active:scale-95"
+                >
+                  Buscar prestador
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              </div>
               <div className="flex flex-col sm:flex-row flex-wrap gap-3">
                 <Link
                   href="/register"
