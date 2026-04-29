@@ -66,6 +66,18 @@ function SocorroContent() {
     setRequestId(data.id)
     setStep('aguardando')
     setLoading(false)
+
+    // Dispara notificação push para prestadores da cidade
+    fetch('/api/push/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tipoServico: form.tipo_servico,
+        cidade: form.cidade,
+        title: `🚨 Chamado SOS — ${TIPOS_SERVICO_LABELS[form.tipo_servico as TipoServico]}`,
+        body: `${form.nome_cliente} precisa de ajuda em ${form.cidade}`,
+      }),
+    })
   }
 
   useEffect(() => {

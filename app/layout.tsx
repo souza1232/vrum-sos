@@ -76,6 +76,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#f97316" />
+      </head>
       <Script src="https://www.googletagmanager.com/gtag/js?id=G-NYZZP3F1XT" strategy="afterInteractive" />
       <Script id="google-analytics" strategy="afterInteractive">{`
         window.dataLayer = window.dataLayer || [];

@@ -1,0 +1,24 @@
+{
+  "name": "Vrum SOS",
+  "short_name": "Vrum SOS",
+  "description": "Assistência automotiva na sua região",
+  "start_url": "/painel/solicitacoes",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#f97316",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/logo-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

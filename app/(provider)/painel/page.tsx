@@ -17,6 +17,7 @@ import {
   AlertCircle, CheckCircle, Edit3, Save, X, FileText, TrendingUp, Camera,
   LocateFixed, Loader2, Navigation, Star, Eye
 } from 'lucide-react'
+import PushNotificationButton from '@/components/ui/PushNotificationButton'
 
 export default function PainelPage() {
   const supabase = createClient()
@@ -364,6 +365,11 @@ export default function PainelPage() {
                 </div>
               </div>
             </div>
+          )}
+
+          {/* Notificações push */}
+          {provider.status_aprovacao === 'aprovado' && (
+            <PushNotificationButton providerId={provider.id} />
           )}
 
           {/* Visibilidade do perfil */}
