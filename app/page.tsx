@@ -114,21 +114,13 @@ export default function HomePage() {
                 perto de você, agora mesmo. Rápido, confiável e verificado.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-3 mb-4">
-                <Link
-                  href="/socorro"
-                  className="inline-flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white font-black px-8 py-4 rounded-xl text-lg transition-all hover:shadow-lg hover:shadow-red-500/30 active:scale-95"
-                >
-                  🚨 Pedir socorro agora
-                </Link>
-                <Link
-                  href="/buscar"
-                  className="inline-flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-black px-8 py-4 rounded-xl text-lg transition-all hover:shadow-lg hover:shadow-orange-500/30 active:scale-95"
-                >
-                  Buscar prestador
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-              </div>
+              <Link
+                href="/buscar"
+                className="inline-flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-black px-8 py-4 rounded-xl text-lg transition-all hover:shadow-lg hover:shadow-orange-500/30 active:scale-95 w-full sm:w-auto mb-4"
+              >
+                Buscar prestador agora
+                <ArrowRight className="w-5 h-5" />
+              </Link>
               <div className="flex flex-col sm:flex-row flex-wrap gap-3">
                 <Link
                   href="/register"
@@ -167,10 +159,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
-              Qual serviço você precisa?
+              O que você precisa agora?
             </h2>
             <p className="text-lg text-gray-500 max-w-xl mx-auto">
-              Clique no serviço e veja os prestadores disponíveis agora — sem cadastro!
+              Clique no serviço e chamamos os prestadores disponíveis na sua cidade agora mesmo.
             </p>
           </div>
 
@@ -178,17 +170,17 @@ export default function HomePage() {
             {servicos.map((s) => (
               <Link
                 key={s.label}
-                href={`/buscar?tipo=${s.tipo}`}
-                className="group flex flex-col items-center gap-3 p-5 rounded-2xl border border-gray-100 bg-white hover:border-orange-300 hover:bg-orange-50 hover:shadow-md transition-all"
+                href={`/socorro?tipo=${s.tipo}`}
+                className="group flex flex-col items-center gap-3 p-5 rounded-2xl border border-gray-100 bg-white hover:border-red-300 hover:bg-red-50 hover:shadow-md transition-all"
               >
                 <div className={`w-14 h-14 ${s.cor} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm`}>
                   <s.icon className="w-7 h-7 text-white" />
                 </div>
-                <span className="text-sm font-semibold text-gray-700 text-center leading-tight group-hover:text-orange-600 transition-colors">
+                <span className="text-sm font-semibold text-gray-700 text-center leading-tight group-hover:text-red-600 transition-colors">
                   {s.label}
                 </span>
-                <span className="text-xs text-orange-500 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                  Ver prestadores →
+                <span className="text-xs text-red-500 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                  Pedir agora →
                 </span>
               </Link>
             ))}

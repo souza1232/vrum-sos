@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { Zap, AlertTriangle, Clock, CheckCircle, MessageCircle } from 'lucide-react'
@@ -16,15 +17,18 @@ const TIPOS = [
   { value: 'guincho_pesado', label: 'Guincho Pesado', cor: 'bg-orange-500' },
 ]
 
-export default function SocorroPage() {
+function SocorroContent() {
   const supabase = createClient()
+  const searchParams = useSearchParams()
+  const tipoInicial = searchParams.get('tipo') ?? ''
+
   const [step, setStep] = useState<'form' | 'aguardando' | 'aceito'>('form')
   const [requestId, setRequestId] = useState<string | null>(null)
   const [provider, setProvider] = useState<any>(null)
   const [form, setForm] = useState({
     nome_cliente: '',
     telefone_cliente: '',
-    tipo_servico: '',
+    tipo_servico: tipoInicial,
     cidade: '',
     observacao: '',
   })
@@ -265,5 +269,13 @@ export default function SocorroPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function SocorroPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-900" />}>
+      <SocorroContent />
+    </Suspense>
   )
 }
