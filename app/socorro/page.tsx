@@ -236,7 +236,7 @@ function SocorroContent() {
                   <p className="text-4xl mb-3">😔</p>
                   <p className="text-white font-semibold mb-1">Sem prestadores na sua cidade ainda</p>
                   <p className="text-gray-400 text-sm mb-6">
-                    Tente uma cidade próxima ou ligue para o DETRAN da sua região.
+                    Ainda não temos prestadores nessa cidade. Tente buscar por uma cidade próxima.
                   </p>
                   <button
                     onClick={() => setStep('form')}
