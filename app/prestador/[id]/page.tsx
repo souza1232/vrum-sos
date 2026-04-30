@@ -277,7 +277,7 @@ export default function PublicProviderPage() {
                 Entrar e solicitar
               </Link>
               <Link
-                href="/cadastro"
+                href="/register"
                 className="block w-full text-center text-orange-100 hover:text-white text-xs mt-2 transition-colors"
               >
                 Ainda não tenho conta

@@ -232,7 +232,7 @@ export default function ProviderRegisterPage() {
             <Wrench className="w-6 h-6 text-blue-600" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900">Cadastro de Prestador</h1>
-          <p className="text-gray-500 mt-1">Preencha seus dados profissionais. Após aprovação, você aparecerá na plataforma.</p>
+          <p className="text-gray-500 mt-1">Preencha seus dados profissionais. Seu perfil fica ativo na hora.</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

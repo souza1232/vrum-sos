@@ -98,7 +98,7 @@ export default function AvaliarPage({ params }: { params: { id: string } }) {
               <Link href="/buscar" className="flex-1 text-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl text-sm transition-colors">
                 Buscar prestadores
               </Link>
-              <Link href={`/p/${params.id}`} className="flex-1 text-center border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold py-3 rounded-xl text-sm transition-colors">
+              <Link href={`/prestador/${params.id}`} className="flex-1 text-center border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold py-3 rounded-xl text-sm transition-colors">
                 Ver perfil
               </Link>
             </div>
@@ -114,7 +114,7 @@ export default function AvaliarPage({ params }: { params: { id: string } }) {
               <Link href="/buscar" className="flex-1 text-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl text-sm transition-colors">
                 Buscar prestadores
               </Link>
-              <Link href={`/p/${params.id}`} className="flex-1 text-center border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold py-3 rounded-xl text-sm transition-colors">
+              <Link href={`/prestador/${params.id}`} className="flex-1 text-center border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold py-3 rounded-xl text-sm transition-colors">
                 Ver perfil
               </Link>
             </div>
