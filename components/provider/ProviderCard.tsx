@@ -181,7 +181,7 @@ export default function ProviderCard({ provider, userId, isFavorited = false, on
           </a>
         )}
         <Link
-          href={`/dashboard/providers/${provider.id}`}
+          href={`/prestador/${provider.id}`}
           className="flex-1 flex items-center justify-center gap-2 border border-gray-200 hover:border-orange-300 hover:bg-orange-50 text-gray-700 hover:text-orange-700 text-sm font-semibold py-2.5 rounded-xl transition-colors"
         >
           <Eye className="w-4 h-4" />

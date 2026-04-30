@@ -49,6 +49,20 @@ export default function PainelPage() {
         setProvider(providerData as Provider)
         setForm(providerData as Provider)
 
+        // Auto-geocodifica se coordenadas estiverem ausentes
+        if (!providerData.latitude) {
+          geocodeCity(providerData.cidade, providerData.estado).then(async (coords) => {
+            if (!coords) return
+            const { error } = await supabase
+              .from('providers')
+              .update({ latitude: coords.lat, longitude: coords.lng })
+              .eq('id', providerData.id)
+            if (!error) {
+              setProvider(prev => prev ? { ...prev, latitude: coords.lat, longitude: coords.lng } : prev)
+            }
+          })
+        }
+
         // Buscar stats de solicitações
         const { data: reqs } = await supabase
           .from('service_requests')

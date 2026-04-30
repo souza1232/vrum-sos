@@ -466,11 +466,11 @@ export default function ProviderRegisterPage() {
           )}
 
           <Button type="submit" fullWidth size="lg" loading={isSubmitting} variant="secondary">
-            Enviar cadastro para aprovação
+            Criar minha conta
           </Button>
 
           <p className="text-xs text-gray-400 text-center">
-            Após o cadastro, sua conta ficará <strong>pendente de aprovação</strong>. Em breve entraremos em contato.
+            Seu perfil fica <strong>ativo imediatamente</strong> após o cadastro.
           </p>
         </form>
 

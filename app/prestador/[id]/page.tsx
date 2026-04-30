@@ -271,7 +271,7 @@ export default function PublicProviderPage() {
                 Crie uma conta gratuita no Vrum SOS para enviar solicitações e acompanhar seu atendimento.
               </p>
               <Link
-                href={`/login?redirect=/dashboard/providers/${provider.id}`}
+                href={`/login?redirect=/prestador/${provider.id}`}
                 className="block w-full text-center bg-white text-orange-600 font-semibold text-sm py-2.5 rounded-xl hover:bg-orange-50 transition-colors"
               >
                 Entrar e solicitar

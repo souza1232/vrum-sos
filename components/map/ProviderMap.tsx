@@ -113,7 +113,7 @@ export default function ProviderMap({
                       </a>
                     )}
                     <Link
-                      href={`/dashboard/providers/${p.id}`}
+                      href={`/prestador/${p.id}`}
                       className="flex-1 text-center text-xs font-semibold border border-gray-200 hover:bg-gray-50 text-gray-700 py-1.5 rounded-lg transition-colors"
                     >
                       Ver perfil

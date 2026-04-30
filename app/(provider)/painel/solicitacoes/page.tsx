@@ -8,7 +8,8 @@ import { StatusBadge } from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
 import { formatDate } from '@/lib/utils'
-import { FileText, Check, X, RefreshCw, AlertCircle, Siren } from 'lucide-react'
+import { FileText, Check, X, RefreshCw, AlertCircle, Siren, MessageCircle } from 'lucide-react'
+import { whatsappLink } from '@/lib/utils'
 
 interface RequestWithUser {
   id: string
@@ -289,15 +290,28 @@ export default function ProviderSolicitacoesPage() {
                     </div>
                   )}
 
-                  <Button
-                    size="sm"
-                    loading={actionLoading === r.id}
-                    onClick={() => aceitarSos(r.id)}
-                    className="w-full !bg-red-500 hover:!bg-red-600 !text-white font-bold"
-                  >
-                    <Check className="w-4 h-4" />
-                    Aceitar chamado SOS
-                  </Button>
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      size="sm"
+                      loading={actionLoading === r.id}
+                      onClick={() => aceitarSos(r.id)}
+                      className="w-full !bg-red-500 hover:!bg-red-600 !text-white font-bold"
+                    >
+                      <Check className="w-4 h-4" />
+                      Aceitar chamado SOS
+                    </Button>
+                    {r.telefone_cliente && (
+                      <a
+                        href={whatsappLink(r.telefone_cliente, `Olá ${r.nome_cliente ?? 'cliente'}, sou ${profile?.nome ?? 'prestador'} do Vrum SOS e vi seu chamado de ${tipoLabel[r.tipo_servico] ?? r.tipo_servico} em ${r.cidade}. Posso te ajudar! Pode me passar sua localização?`)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold py-2 rounded-xl transition-colors"
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                        Chamar no WhatsApp
+                      </a>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -381,7 +395,7 @@ export default function ProviderSolicitacoesPage() {
                     </div>
                   )}
 
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {r.status === 'pendente' && (
                       <>
                         <Button
@@ -415,6 +429,17 @@ export default function ProviderSolicitacoesPage() {
                         <Check className="w-3.5 h-3.5" />
                         Marcar como concluído
                       </Button>
+                    )}
+                    {r.telefone_cliente && (
+                      <a
+                        href={whatsappLink(r.telefone_cliente, `Olá ${r.user?.nome ?? r.nome_cliente ?? 'cliente'}, sou ${profile?.nome ?? 'prestador'} do Vrum SOS e recebi sua solicitação de ${tipoLabel[r.tipo_servico] ?? r.tipo_servico}. Vou entrar em contato para combinar o atendimento!`)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        WhatsApp
+                      </a>
                     )}
                   </div>
                 </div>
