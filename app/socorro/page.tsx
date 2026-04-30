@@ -300,7 +300,8 @@ function SocorroContent() {
                 <div className="space-y-3">
                   {providers.map(p => {
                     const nome = p.nome_empresa || p.nome
-                    const msg = `Olá ${nome}! Vi seu contato no Vrum SOS e preciso de ${TIPOS_SERVICO_LABELS[form.tipo_servico as TipoServico]} em ${form.cidade}. Meu nome é ${form.nome_cliente}.${form.observacao ? ` Problema: ${form.observacao}` : ''}`
+                    const avaliarUrl = `${process.env.NEXT_PUBLIC_APP_URL}/avaliar/${p.id}`
+                    const msg = `Olá ${nome}! Vi seu contato no Vrum SOS e preciso de ${TIPOS_SERVICO_LABELS[form.tipo_servico as TipoServico]} em ${form.cidade}. Meu nome é ${form.nome_cliente}.${form.observacao ? ` Problema: ${form.observacao}` : ''}\n\nApós o atendimento, poderia me avaliar aqui? ${avaliarUrl}`
 
                     return (
                       <div key={p.id} className="bg-gray-800 rounded-2xl p-4 border border-gray-700">
@@ -370,6 +371,12 @@ function SocorroContent() {
                             </a>
                           )}
                         </div>
+                        <a
+                          href={`/avaliar/${p.id}`}
+                          className="block text-center text-xs text-gray-500 hover:text-orange-400 transition-colors pt-1"
+                        >
+                          ⭐ Avaliar após o atendimento
+                        </a>
                       </div>
                     )
                   })}
