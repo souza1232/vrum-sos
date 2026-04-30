@@ -4,9 +4,19 @@ import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
-import { Zap, AlertTriangle, MessageCircle, Phone, MapPin, Star, ChevronRight } from 'lucide-react'
+import { Zap, AlertTriangle, MessageCircle, Phone, MapPin, ChevronRight } from 'lucide-react'
 import { TIPOS_SERVICO_LABELS, TipoServico } from '@/types'
 import { whatsappLink } from '@/lib/utils'
+import { geocodeAddress } from '@/lib/geocoding'
+
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number) {
+  const R = 6371
+  const dLat = (lat2 - lat1) * Math.PI / 180
+  const dLng = (lng2 - lng1) * Math.PI / 180
+  const a = Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+}
 
 const TIPOS = [
   { value: 'guincho',        label: 'Guincho',        cor: 'bg-red-500',    corLight: 'bg-red-50 border-red-300 text-red-700' },
@@ -24,10 +34,14 @@ interface Provider {
   whatsapp: string | null
   telefone: string | null
   cidade: string
+  estado: string
   descricao: string | null
   foto_url: string | null
   atende_24h: boolean
   atendimento_emergencial: boolean
+  latitude: number | null
+  longitude: number | null
+  distanciaKm?: number
 }
 
 function SocorroContent() {
@@ -56,14 +70,13 @@ function SocorroContent() {
     setLoading(true)
     setError('')
 
+    // Busca todos os prestadores aprovados com esse serviço (sem filtro de cidade)
     const { data, error: err } = await supabase
       .from('providers')
-      .select('id, nome, nome_empresa, whatsapp, telefone, cidade, descricao, foto_url, atende_24h, atendimento_emergencial')
+      .select('id, nome, nome_empresa, whatsapp, telefone, cidade, estado, descricao, foto_url, atende_24h, atendimento_emergencial, latitude, longitude')
       .eq('status_aprovacao', 'aprovado')
       .eq('ativo', true)
-      .ilike('cidade', `%${form.cidade}%`)
       .contains('tipos_servico', [form.tipo_servico])
-      .order('atende_24h', { ascending: false })
 
     setLoading(false)
 
@@ -72,7 +85,35 @@ function SocorroContent() {
       return
     }
 
-    setProviders(data ?? [])
+    let lista: Provider[] = data ?? []
+
+    // Ordena por proximidade se conseguir geocodificar a cidade do cliente
+    const coords = await geocodeAddress(`${form.cidade}, Brasil`)
+    if (coords) {
+      lista = lista.map(p => ({
+        ...p,
+        distanciaKm: p.latitude && p.longitude
+          ? Math.round(haversineKm(coords.lat, coords.lng, p.latitude, p.longitude))
+          : undefined,
+      }))
+      lista.sort((a, b) => {
+        if (a.distanciaKm == null && b.distanciaKm == null) return 0
+        if (a.distanciaKm == null) return 1
+        if (b.distanciaKm == null) return -1
+        return a.distanciaKm - b.distanciaKm
+      })
+    } else {
+      // Sem coordenadas: cidade exata primeiro, depois os demais
+      lista.sort((a, b) => {
+        const aLocal = a.cidade.toLowerCase().includes(form.cidade.toLowerCase())
+        const bLocal = b.cidade.toLowerCase().includes(form.cidade.toLowerCase())
+        if (aLocal && !bLocal) return -1
+        if (!aLocal && bLocal) return 1
+        return 0
+      })
+    }
+
+    setProviders(lista)
     setStep('lista')
 
     // Registra o chamado e dispara push (fire and forget)
@@ -223,26 +264,26 @@ function SocorroContent() {
                 </button>
                 <h2 className="text-2xl font-black text-white">
                   {providers.length > 0
-                    ? `${providers.length} prestador${providers.length > 1 ? 'es' : ''} encontrado${providers.length > 1 ? 's' : ''}`
-                    : 'Nenhum prestador encontrado'}
+                    ? `${providers.length} prestador${providers.length > 1 ? 'es' : ''} próximo${providers.length > 1 ? 's' : ''}`
+                    : 'Nenhum prestador disponível'}
                 </h2>
                 <p className="text-gray-400 text-sm mt-1">
-                  {tipoAtual?.label} em <strong className="text-white">{form.cidade}</strong>
+                  {tipoAtual?.label} — mais próximos de <strong className="text-white">{form.cidade}</strong>
                 </p>
               </div>
 
               {providers.length === 0 ? (
                 <div className="bg-gray-800 rounded-2xl p-8 text-center">
                   <p className="text-4xl mb-3">😔</p>
-                  <p className="text-white font-semibold mb-1">Sem prestadores na sua cidade ainda</p>
+                  <p className="text-white font-semibold mb-1">Nenhum prestador cadastrado ainda</p>
                   <p className="text-gray-400 text-sm mb-6">
-                    Ainda não temos prestadores nessa cidade. Tente buscar por uma cidade próxima.
+                    Ainda não temos prestadores de {tipoAtual?.label.toLowerCase()} na plataforma. Tente outro tipo de serviço.
                   </p>
                   <button
                     onClick={() => setStep('form')}
                     className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-xl transition-colors"
                   >
-                    Tentar outra cidade
+                    Voltar e tentar outro serviço
                   </button>
                 </div>
               ) : (
@@ -275,9 +316,20 @@ function SocorroContent() {
                                 <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full font-semibold">Emergência</span>
                               )}
                             </div>
-                            <div className="flex items-center gap-1 mt-0.5">
+                            <div className="flex items-center gap-1 mt-0.5 flex-wrap">
                               <MapPin className="w-3 h-3 text-gray-400" />
-                              <p className="text-gray-400 text-sm">{p.cidade}</p>
+                              <p className="text-gray-400 text-sm">{p.cidade} — {p.estado}</p>
+                              {p.distanciaKm != null && (
+                                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                                  p.distanciaKm <= 30
+                                    ? 'bg-green-900 text-green-300'
+                                    : p.distanciaKm <= 100
+                                    ? 'bg-yellow-900 text-yellow-300'
+                                    : 'bg-gray-700 text-gray-300'
+                                }`}>
+                                  ~{p.distanciaKm} km
+                                </span>
+                              )}
                             </div>
                           </div>
                         </div>
