@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import Footer from '@/components/layout/Footer'
 import CarAnimation from '@/components/ui/CarAnimation'
+import LooviCarousel from '@/components/ui/LooviCarousel'
 
 const servicos = [
   { icon: Wrench, label: 'Mecânico', cor: 'bg-blue-500', tipo: 'mecanico' },
@@ -185,6 +186,13 @@ export default function HomePage() {
               </Link>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* BANNER LOOVI */}
+      <section className="py-10 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <LooviCarousel />
         </div>
       </section>
 
