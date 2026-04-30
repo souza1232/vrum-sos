@@ -48,6 +48,12 @@ export function formatDate(dateString: string): string {
   })
 }
 
+/** Retorna true entre 19h e 6h — horário noturno */
+export function isNightTime(): boolean {
+  const h = new Date().getHours()
+  return h >= 19 || h < 6
+}
+
 /** Fórmula de Haversine — retorna distância em km entre dois pontos geográficos */
 export function haversineDistance(
   lat1: number, lng1: number,

@@ -10,7 +10,7 @@ import ProviderMapWrapper from '@/components/map/ProviderMapWrapper'
 import SkeletonCard from '@/components/ui/SkeletonCard'
 import LooviCarousel from '@/components/ui/LooviCarousel'
 import { SearchX, Wrench, LayoutGrid, Map } from 'lucide-react'
-import { haversineDistance } from '@/lib/utils'
+import { haversineDistance, isNightTime } from '@/lib/utils'
 
 type ProviderWithMeta = Provider & {
   avg_rating?: number
@@ -107,6 +107,15 @@ export default function DashboardPage() {
           const da = a.distance_km ?? Infinity
           const db = b.distance_km ?? Infinity
           return da - db
+        })
+      }
+
+      // Boost noturno: das 19h às 6h, prestadores 24h sobem para o topo
+      if (isNightTime()) {
+        enriched.sort((a, b) => {
+          if (a.atende_24h && !b.atende_24h) return -1
+          if (!a.atende_24h && b.atende_24h) return 1
+          return 0
         })
       }
 

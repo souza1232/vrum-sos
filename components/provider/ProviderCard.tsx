@@ -8,6 +8,7 @@ import { whatsappLink } from '@/lib/utils'
 import { MapPin, Clock, MessageCircle, Eye, Building2, User, Zap, Star, Heart, Navigation } from 'lucide-react'
 import Badge from '@/components/ui/Badge'
 import { createClient } from '@/lib/supabase/client'
+import { isNightTime } from '@/lib/utils'
 
 interface ProviderCardProps {
   provider: Provider & {
@@ -24,6 +25,8 @@ export default function ProviderCard({ provider, userId, isFavorited = false, on
   const supabase = createClient()
   const [fav, setFav] = useState(isFavorited)
   const [favLoading, setFavLoading] = useState(false)
+  const nightTime = isNightTime()
+  const abertoAgora = nightTime && provider.atende_24h
 
   const wLink = provider.whatsapp
     ? whatsappLink(provider.whatsapp, `Olá ${provider.nome}, vi seu perfil no Vrum SOS e gostaria de solicitar um atendimento.`)
@@ -51,7 +54,9 @@ export default function ProviderCard({ provider, userId, isFavorited = false, on
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:border-orange-200 transition-all duration-200 overflow-hidden group">
+    <div className={`bg-white rounded-2xl border shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden group ${
+      abertoAgora ? 'border-green-400 ring-1 ring-green-300' : 'border-gray-200 hover:border-orange-200'
+    }`}>
       {/* Cabeçalho */}
       <div className="bg-gradient-to-r from-slate-800 to-slate-700 px-5 py-4">
         <div className="flex items-start justify-between gap-3">
@@ -134,7 +139,12 @@ export default function ProviderCard({ provider, userId, isFavorited = false, on
         </div>
 
         <div className="flex flex-wrap gap-1.5">
-          {provider.atende_24h && (
+          {abertoAgora && (
+            <span className="inline-flex items-center gap-1 text-xs font-bold text-white bg-green-500 px-2.5 py-1 rounded-full animate-pulse">
+              🌙 Aberto agora
+            </span>
+          )}
+          {provider.atende_24h && !abertoAgora && (
             <span className="inline-flex items-center gap-1 text-xs font-medium text-green-700 bg-green-50 px-2 py-0.5 rounded-full">
               <Clock className="w-3 h-3" />24h
             </span>

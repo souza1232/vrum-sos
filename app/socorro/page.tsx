@@ -8,6 +8,7 @@ import { Zap, AlertTriangle, MessageCircle, Phone, MapPin, ChevronRight } from '
 import { TIPOS_SERVICO_LABELS, TipoServico } from '@/types'
 import { whatsappLink } from '@/lib/utils'
 import { geocodeAddress } from '@/lib/geocoding'
+import { isNightTime } from '@/lib/utils'
 
 function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number) {
   const R = 6371
@@ -109,6 +110,15 @@ function SocorroContent() {
         const bLocal = b.cidade.toLowerCase().includes(form.cidade.toLowerCase())
         if (aLocal && !bLocal) return -1
         if (!aLocal && bLocal) return 1
+        return 0
+      })
+    }
+
+    // Boost noturno: das 19h às 6h, prestadores 24h sobem para o topo
+    if (isNightTime()) {
+      lista.sort((a, b) => {
+        if (a.atende_24h && !b.atende_24h) return -1
+        if (!a.atende_24h && b.atende_24h) return 1
         return 0
       })
     }
