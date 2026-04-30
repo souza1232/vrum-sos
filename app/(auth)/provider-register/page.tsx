@@ -170,7 +170,7 @@ export default function ProviderRegisterPage() {
       descricao: data.descricao || null,
       pix: data.pix || null,
       foto_url: fotoUrl,
-      status_aprovacao: 'pendente',
+      status_aprovacao: 'aprovado',
       latitude: coords?.lat ?? null,
       longitude: coords?.lng ?? null,
     })
@@ -187,7 +187,7 @@ export default function ProviderRegisterPage() {
         .join(', ')
 
       await Promise.allSettled([
-        sendProviderStatusEmail(data.email, data.nome, 'pending', data.nome_empresa || undefined),
+        sendProviderStatusEmail(data.email, data.nome, 'approved', data.nome_empresa || undefined),
         sendAdminNotification({
           nome: data.nome,
           nomeEmpresa: data.nome_empresa || undefined,
@@ -214,9 +214,9 @@ export default function ProviderRegisterPage() {
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
-          <h2 className="text-xl font-bold text-slate-900 mb-2">Cadastro enviado!</h2>
+          <h2 className="text-xl font-bold text-slate-900 mb-2">Cadastro aprovado!</h2>
           <p className="text-gray-500 text-sm">
-            Seu cadastro foi recebido e está em análise. Você será notificado quando for aprovado.
+            Seu perfil já está ativo na plataforma. Ative as notificações no seu painel para receber chamados SOS.
           </p>
         </div>
       </div>
