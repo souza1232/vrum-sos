@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import webpush from 'web-push'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 webpush.setVapidDetails(
   'mailto:gzussouza@gmail.com',
@@ -29,8 +30,9 @@ export async function POST(req: NextRequest) {
 
   const providerIds = providers.map(p => p.id)
 
-  // Busca subscriptions desses prestadores
-  const { data: subs } = await supabase
+  // Busca subscriptions desses prestadores (usa service role para bypassar RLS)
+  const admin = createAdminClient()
+  const { data: subs } = await admin
     .from('push_subscriptions')
     .select('endpoint, p256dh, auth')
     .in('provider_id', providerIds)
